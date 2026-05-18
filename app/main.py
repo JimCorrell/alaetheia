@@ -12,8 +12,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+import app.auth.models  # noqa: F401 — registers models with Base before create_all
 from app.api.router import api_router
 from app.config import get_settings
+from app.db import Base, make_engine, make_session_factory
 
 # ── Logging ───────────────────────────────────────────────────────────
 
@@ -41,10 +43,18 @@ async def lifespan(app: FastAPI):
     )
     log.info("Redis pool created → %s", settings.redis_url)
 
+    # Postgres — create tables if they don't exist, then share session factory
+    engine = make_engine(settings.database_url)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    app.state.db_session_factory = make_session_factory(engine)
+    log.info("Database ready → %s", settings.database_url.split("@")[-1])
+
     yield  # ← application runs here
 
     log.info("Shutting down Aletheia…")
     await app.state.redis_pool.aclose()
+    await engine.dispose()
 
 
 # ── App Factory ───────────────────────────────────────────────────────
