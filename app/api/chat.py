@@ -5,7 +5,6 @@ POST /api/v1/chat/stream   — SSE streaming response
 DELETE /api/v1/chat/{session_id} — clear session history
 GET  /api/v1/chat/{session_id}/history — inspect history
 """
-import asyncio
 import logging
 
 from fastapi import APIRouter, HTTPException

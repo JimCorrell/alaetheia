@@ -7,27 +7,6 @@ from pydantic import BaseModel, Field
 import time
 
 
-# ── Intent Classification ─────────────────────────────────────────────
-
-class IntentType(str, Enum):
-    CONVERSATIONAL   = "conversational"    # General chat / Q&A
-    TOOL_USE         = "tool_use"          # Needs a tool call
-    AGENT_TASK       = "agent_task"        # Needs a multi-step agent
-    MEMORY_RECALL    = "memory_recall"     # Retrieve from Akasha / history
-    SMART_HOME       = "smart_home"        # Home Assistant actions
-    CALENDAR_EMAIL   = "calendar_email"    # Gmail / GCal
-    NEHO_INTEL       = "neho_intel"        # NEHO research / briefing
-    STRATSPHERE      = "stratsphere"       # StratSphere queries
-
-
-class IntentClassification(BaseModel):
-    intent: IntentType
-    confidence: float = Field(ge=0.0, le=1.0)
-    requires_tools: bool = False
-    tool_hints: list[str] = []
-    rationale: str = ""
-
-
 # ── Chat ──────────────────────────────────────────────────────────────
 
 class ChatMessage(BaseModel):
@@ -57,7 +36,6 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     session_id: str
     message: str
-    intent: IntentType
     tool_calls: list[dict[str, Any]] = []
     latency_ms: float
     model_used: str
