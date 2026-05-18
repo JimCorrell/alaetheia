@@ -6,14 +6,14 @@ Voice-first AI orchestrator. FastAPI + Claude API + Redis + pgvector.
 
 ```bash
 # 1. Create venv
-python3.12 -m venv .venv && source .venv/bin/activate
+python3.13 -m venv .venv && source .venv/bin/activate
 
 # 2. Install deps
 pip install -r requirements.txt
 
 # 3. Configure
-cp .env.example .env
-# Edit .env — minimum required: ANTHROPIC_API_KEY
+# Create .env — minimum required: ANTHROPIC_API_KEY
+# cp .env .env.bak  (never commit .env)
 
 # 4. Start Redis (Docker)
 docker compose up -d redis
