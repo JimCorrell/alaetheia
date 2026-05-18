@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     elevenlabs_voice_id: str = "21m00Tcm4TlvDq8ikWAM"  # Rachel
     whisper_model_path: str = "/opt/whisper/models/base.en"
 
+    # —— Tavily —————————————————————————————————————————————————————
+    tavily_api_key: str = ""
+
     # ── Memory / Akasha ──────────────────────────────────────────
     database_url: str = "postgresql+asyncpg://aletheia:aletheia@localhost:5432/aletheia"
     pgvector_collection: str = "akasha_memory"

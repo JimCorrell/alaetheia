@@ -97,15 +97,17 @@ async def _get_weather(args: dict) -> dict:
     return await get_weather(args)
 
 
-# ── Stub tools (no schema — not surfaced to Claude until implemented) ─
+from app.tools.web_search import web_search, TOOL_SCHEMA as _web_search_schema
 
 @registry.register(
     name="web_search",
-    description="Search the web for current information. Args: {query: str}",
+    description="Search the web for current information, news, or facts.",
+    input_schema=_web_search_schema,
 )
 async def _web_search(args: dict) -> dict:
-    return {"status": "stub", "message": "Web search coming in Phase 2."}
+    return await web_search(args)
 
+# ── Stub tools (no schema — not surfaced to Claude until implemented) ─
 
 @registry.register(
     name="smart_home",
