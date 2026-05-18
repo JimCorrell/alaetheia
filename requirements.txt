@@ -1,0 +1,36 @@
+# Aletheia — Python dependencies
+# Install: pip install -r requirements.txt
+
+# ── Web Framework ────────────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+gunicorn==23.0.0
+
+# ── Anthropic ────────────────────────────────────────────────────────
+anthropic==0.40.0
+
+# ── Redis ────────────────────────────────────────────────────────────
+redis[asyncio]==5.2.1
+
+# ── Database (Phase 2 — pgvector) ────────────────────────────────────
+asyncpg==0.30.0
+sqlalchemy[asyncio]==2.0.36
+pgvector==0.3.6
+alembic==1.14.0
+
+# ── Config ───────────────────────────────────────────────────────────
+pydantic==2.10.3
+pydantic-settings==2.7.0
+
+# ── HTTP client ───────────────────────────────────────────────────────
+httpx==0.28.1
+
+# ── Voice (Phase 1) ───────────────────────────────────────────────────
+# elevenlabs==1.12.0       # TTS — uncomment when activating voice
+# openai-whisper==20240930 # STT — installed separately on VM (GPU target)
+
+# ── Dev / Testing ────────────────────────────────────────────────────
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1     # test client
+python-dotenv==1.0.1
