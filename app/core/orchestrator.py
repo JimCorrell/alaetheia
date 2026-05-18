@@ -1,8 +1,8 @@
 """
 Aletheia — Core Orchestrator
-Single-stage pipeline: user message → Claude Sonnet → response.
-Intent classification and tool routing will be added when tools are wired.
+Agentic tool-use loop: user message → Claude Sonnet → [tool calls] → response.
 """
+import json
 import logging
 import time
 from typing import Any, AsyncIterator
@@ -37,30 +37,56 @@ class Orchestrator:
     ) -> ChatResponse:
         t0 = time.monotonic()
 
-        user_msg = ChatMessage(role="user", content=user_message)
-        await self.session.append(session_id, user_msg)
+        await self.session.append(session_id, ChatMessage(role="user", content=user_message))
+        messages = await self.session.get_anthropic_messages(session_id)
+        system   = self._build_system_prompt(context or {})
+        tools    = self.tools.to_anthropic_tools()
 
-        history = await self.session.get_anthropic_messages(session_id)
-        system  = self._build_system_prompt(context or {})
+        tool_calls_made: list[dict] = []
+        response_text = ""
+        tokens = 0
 
-        resp = await self.client.messages.create(
-            model=self.settings.claude_sonnet_model,
-            max_tokens=self.settings.max_response_tokens,
-            system=system,
-            messages=history,
-        )
+        while True:
+            resp = await self.client.messages.create(
+                model=self.settings.claude_sonnet_model,
+                max_tokens=self.settings.max_response_tokens,
+                system=system,
+                messages=messages,
+                **({"tools": tools} if tools else {}),
+            )
+            tokens += resp.usage.input_tokens + resp.usage.output_tokens
+            messages.append({"role": "assistant", "content": resp.content})
 
-        response_text = resp.content[0].text
-        tokens = resp.usage.input_tokens + resp.usage.output_tokens
+            if resp.stop_reason == "tool_use":
+                tool_results = []
+                for block in resp.content:
+                    if block.type == "tool_use":
+                        log.info("Tool call: %s %s", block.name, block.input)
+                        try:
+                            result = await self.tools.run(block.name, block.input)
+                        except Exception as exc:
+                            result = {"error": str(exc)}
+                        tool_calls_made.append({"name": block.name, "input": block.input, "result": result})
+                        tool_results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": json.dumps(result),
+                        })
+                messages.append({"role": "user", "content": tool_results})
+                continue
 
-        await self.session.append(
-            session_id, ChatMessage(role="assistant", content=response_text)
-        )
+            # end_turn or no tools — extract text and exit loop
+            response_text = next(
+                (b.text for b in resp.content if hasattr(b, "text")), ""
+            )
+            break
+
+        await self.session.append(session_id, ChatMessage(role="assistant", content=response_text))
 
         return ChatResponse(
             session_id=session_id,
             message=response_text,
-            tool_calls=[],
+            tool_calls=tool_calls_made,
             latency_ms=round((time.monotonic() - t0) * 1000, 1),
             model_used=self.settings.claude_sonnet_model,
             tokens_used=tokens,
@@ -72,21 +98,47 @@ class Orchestrator:
         user_message: str,
         context: dict[str, Any] | None = None,
     ) -> AsyncIterator[str]:
-        user_msg = ChatMessage(role="user", content=user_message)
-        await self.session.append(session_id, user_msg)
+        await self.session.append(session_id, ChatMessage(role="user", content=user_message))
+        messages = await self.session.get_anthropic_messages(session_id)
+        system   = self._build_system_prompt(context or {})
+        tools    = self.tools.to_anthropic_tools()
 
-        history = await self.session.get_anthropic_messages(session_id)
-        full_response = []
+        full_response: list[str] = []
 
-        async with self.client.messages.stream(
-            model=self.settings.claude_sonnet_model,
-            max_tokens=self.settings.max_response_tokens,
-            system=self._build_system_prompt(context or {}),
-            messages=history,
-        ) as stream:
-            async for chunk in stream.text_stream:
-                full_response.append(chunk)
-                yield chunk
+        while True:
+            async with self.client.messages.stream(
+                model=self.settings.claude_sonnet_model,
+                max_tokens=self.settings.max_response_tokens,
+                system=system,
+                messages=messages,
+                **({"tools": tools} if tools else {}),
+            ) as stream:
+                async for chunk in stream.text_stream:
+                    full_response.append(chunk)
+                    yield chunk
+                final = await stream.get_final_message()
+
+            messages.append({"role": "assistant", "content": final.content})
+
+            if final.stop_reason == "tool_use":
+                tool_results = []
+                for block in final.content:
+                    if block.type == "tool_use":
+                        log.info("Tool call (stream): %s %s", block.name, block.input)
+                        try:
+                            result = await self.tools.run(block.name, block.input)
+                        except Exception as exc:
+                            result = {"error": str(exc)}
+                        tool_results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": json.dumps(result),
+                        })
+                messages.append({"role": "user", "content": tool_results})
+                full_response = []
+                continue
+
+            break
 
         await self.session.append(
             session_id,

@@ -71,25 +71,24 @@ aletheia/
 │   │   ├── router.py        # Assembles all sub-routers
 │   │   ├── chat.py          # POST /chat, /chat/stream, history, clear
 │   │   ├── health.py        # GET /health — dependency liveness
-│   │   └── voice.py         # Voice pipeline (Phase 1 stub)
+│   │   └── voice.py         # Voice pipeline (stub)
 │   ├── core/
-│   │   └── orchestrator.py  # Intent classify (Haiku) → generate (Sonnet)
+│   │   └── orchestrator.py  # user message → Claude Sonnet → response
 │   ├── memory/
 │   │   └── redis_store.py   # Session history — Redis list per session_id
 │   ├── models/
 │   │   └── schemas.py       # Pydantic schemas — ChatRequest, ChatResponse, etc.
 │   └── tools/
-│       └── registry.py      # Tool registry + Phase 1 stubs
+│       └── registry.py      # Tool registry + stubs (web_search, calendar, etc.)
 ├── tests/
-│   └── test_phase1.py       # pytest — health, intent, session, tools
+│   └── test_phase1.py       # pytest — health, session, tools
 ├── docker-compose.yml       # Redis + Postgres (phase2 profile) + API
 ├── Dockerfile               # Multi-stage, non-root, gunicorn prod
 ├── deploy.sh                # rsync → VM + docker compose up
-├── requirements.txt
-└── .env.example
+└── requirements.txt
 ```
 
-## Architecture — Phase 1
+## Architecture
 
 ```
 Client (curl / web / iPhone)
@@ -99,27 +98,39 @@ FastAPI (app/main.py)
         │
         ▼
 Orchestrator (app/core/orchestrator.py)
-   ├── 1. Classify intent → Claude Haiku (~200ms)
-   ├── 2. Load history   → Redis SessionStore
-   ├── 3. Generate       → Claude Sonnet (~500ms)
-   └── 4. Persist        → Redis SessionStore
+   ├── 1. Load history   → Redis SessionStore
+   ├── 2. Generate       → Claude Sonnet
+   └── 3. Persist        → Redis SessionStore
         │
         ▼
 ChatResponse (JSON) | SSE stream
 ```
 
-## Phase 1 milestones
+## Milestones
 
-- [x] FastAPI scaffold
-- [x] Claude API integration (Haiku intent + Sonnet response)
-- [x] Redis session memory
-- [x] Text I/O endpoints (chat + stream)
+### Foundation (complete)
+- [x] FastAPI scaffold with lifespan Redis pool
+- [x] Claude Sonnet integration (chat + streaming)
+- [x] Redis session memory with TTL and history trimming
+- [x] Text I/O endpoints: POST /chat, /chat/stream, GET /history, DELETE /session
+- [x] Health check endpoint with dependency liveness
+- [x] Docker + Proxmox deploy pipeline
+- [x] Tool registry scaffold (stubs for Phase 2 tools)
+
+### Phase 1 — Tools & Voice
+- [ ] First real tool: weather agent
+- [ ] Tool use loop wired into orchestrator
+- [ ] Research agent (web search via Tavily)
 - [ ] Whisper STT (self-hosted on Proxmox)
 - [ ] ElevenLabs TTS
 - [ ] WebSocket voice session
-- [ ] Weather agent (first real tool)
-- [ ] Research agent (web search via Tavily)
-- [ ] pgvector Akasha integration
+
+### Phase 2 — Memory & Agents
+- [ ] pgvector / Akasha long-term memory
+- [ ] Smart home integration (Home Assistant)
+- [ ] Calendar & email (Gmail / GCal)
+- [ ] NEHO research briefing agent
+- [ ] StratSphere league management agent
 
 ## Running tests
 
