@@ -6,7 +6,7 @@ The first architectural hypothesis is **one reasoning supervisor with a registry
 
 ## Current state
 
-This bootstrap contains design documents and an empty Python 3.12+ package and test skeleton. It intentionally contains no working application, capability registry, CLI, LLM integration, or supervisor. [Lab 001](docs/labs/lab-001-capability-registry.md) is a specification for the next implementation session, not an implementation claim.
+Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. No capabilities are executed. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
 ## Read in order
 
@@ -20,7 +20,7 @@ This bootstrap contains design documents and an empty Python 3.12+ package and t
 
 | Horizon | Components | Status |
 | --- | --- | --- |
-| NOW | Typed capability contracts and in-memory capability registry | Design specified by Lab 001 |
+| NOW | Typed capability contracts and in-memory capability registry | Implemented in Lab 001 |
 | NEXT | Theia supervisor, planning, execution loop, execution ledger | Planned experiments; no implementation authority yet |
 | LATER / UNPROVEN | Worker agents, agent registry, knowledge graph, vector memory, message bus, distributed runtime | Hypotheses requiring evidence |
 
@@ -28,8 +28,47 @@ Git is the canonical source for project decisions and implementation contracts. 
 
 ## Repository layout
 
-`docs/` holds the versioned design package; `src/alaetheia/` is the future Python package; `tests/` is reserved for executable behavior checks. The empty package marks the layout only.
+`docs/` holds the versioned design package and lab results. `src/alaetheia/contracts.py` defines the types; `registry.py` implements compatibility and discovery; `examples.py` declares the catalog; `cli.py` and `__main__.py` expose inspection. `tests/test_lab001.py` checks library and CLI behavior.
 
 ## Working agreement
 
 Make one bounded lab change at a time. Update the relevant design document or add an ADR when a decision changes. Explain evidence, tradeoffs, and remaining uncertainty. Run the tests appropriate to the increment. Avoid adding dependencies or infrastructure before a concrete capability requires them.
+
+## Run Lab 001
+
+Use Python 3.12 or newer. There are no runtime dependencies.
+
+```sh
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -e .
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/alaetheia list
+.venv/bin/alaetheia list --json
+.venv/bin/alaetheia inspect terrain.slope.analyze --version 2.1.0
+.venv/bin/alaetheia inspect terrain.slope.analyze --range '>=2.0.0 <3.0.0' --json
+```
+
+For offline use without installing build tooling, run `PYTHONPATH=src python3.12 -m alaetheia list` and `PYTHONPATH=src python3.12 -m unittest discover -s tests -v`.
+
+Each CLI invocation loads a fresh explicit sample catalog: six fictional offers, with no persistence, network access, or invocation. `inspect` returns all offers for the ID and optional exact version/range. Invalid input and no matching offers exit with code 2. JSON exposes complete contracts and metadata; human output includes field types, optionality, semantics, provider identity, and metadata.
+
+## Library example
+
+```python
+from alaetheia import Requirement, VersionRange
+from alaetheia.examples import sample_registry
+
+registry = sample_registry()
+requirement = Requirement(
+    'terrain.slope.analyze',
+    VersionRange.parse('>=2.0.0 <3.0.0'),
+)
+candidates = registry.find(requirement)  # Four offers; no ranking.
+first = registry.get(candidates[0].key)  # Exact provider/implementation/contract.
+check = registry.compatible(requirement, first)
+assert check.matches and not check.reasons
+removed = registry.unregister(first.key)  # Removes only this offer.
+registry.register(removed)
+```
+
+`Requirement` optionally accepts `inputs`, `outputs`, all-of `tags`, and an exact `provider_id`. Specified schemas require exact structural equivalence; omitted schemas impose no shape check. Discovery checks declared contract versions, not implementation versions. See [Lab 001 results](docs/labs/lab-001-results.md) for naming, version grammar, unique keys, error behavior, schema limits, and discussion questions.
