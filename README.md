@@ -6,7 +6,7 @@ The first architectural hypothesis is **one reasoning supervisor with a registry
 
 ## Current state
 
-Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
+Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
 ## Read in order
 
@@ -22,6 +22,7 @@ Lab 001 is implemented: immutable typed capability declarations, an in-memory re
 | --- | --- | --- |
 | NOW | Typed capability contracts and in-memory capability registry | Implemented in Lab 001 |
 | NOW | Explicit local invocation and process-local outcome record | Implemented in Lab 002 |
+| NOW | Sequential workflows with explicit wiring and fail-fast records | Implemented in Lab 003 |
 | NEXT | Theia supervisor, planning, execution loop, execution ledger | Planned experiments; no implementation authority yet |
 | LATER / UNPROVEN | Worker agents, agent registry, knowledge graph, vector memory, message bus, distributed runtime | Hypotheses requiring evidence |
 
@@ -94,3 +95,30 @@ print(record.outcome.value, record.outputs)
 ```
 
 The outcome is `success`, `selection_rejected`, `invalid_input`, `provider_failure`, or `invalid_output`. Discovery never selects an implementation automatically. Bindings refer to exact manifests and must be rebuilt after an implementation replacement. Input fields are closed; additional outputs are retained. Optional fields may be absent but may not be `None`. See the results document for precise scalar rules and limitations.
+
+## Run Lab 003
+
+[Lab 003](docs/labs/lab-003-deterministic-workflow.md) composes invocations without a planner. [ADR-004](docs/architecture/decisions/ADR-004-sequential-workflows.md) records the decisions; [results](docs/labs/lab-003-results.md) explain the behavior and open questions.
+
+```sh
+.venv/bin/python -m alaetheia.workflow_example
+.venv/bin/python -m alaetheia.workflow_example --incompatible
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+The first example strips text, counts characters, and formats `Characters: 5`, exiting 0. The deliberately incompatible variant fails the second step's input validation, skips the third, and exits 1. Both print a workflow record containing the definition and ordered step outcomes.
+
+```python
+from alaetheia import InputBinding, Literal, OutputRef, Workflow, WorkflowRunner, WorkflowStep
+
+# Given a LocalExecutor and exact keys/requirements for two local offers:
+workflow = Workflow('two-counts', (
+    WorkflowStep('first', selected_key, requirement,
+                 (InputBinding('text', Literal('Theia')),)),
+    WorkflowStep('second', other_key, other_requirement,
+                 (InputBinding('count', OutputRef('first', 'count')),)),
+))
+record = WorkflowRunner(executor).run(workflow)
+```
+
+For a fully wired runnable example, use `example()` in `alaetheia.workflow_example`. Only earlier declared output fields can be referenced. Missing referenced values fail the step; no defaults or implicit forwarding occur. All later steps are skipped after the first failure. Inputs and outputs still pass through the Lab 002 validator. `workflow.py` contains the types and runner; `tests/test_lab003.py` covers composition and failure propagation.

@@ -10,3 +10,9 @@ __all__ = ['CapabilityContract', 'CapabilityManifest', 'Field', 'FieldType',
 from .execution import ExecutionRecord, LocalBinding, LocalExecutor, Outcome, validate_payload
 
 __all__ += ["ExecutionRecord", "LocalBinding", "LocalExecutor", "Outcome", "validate_payload"]
+
+from .workflow import (InputBinding, Literal, OutputRef, StepRecord, StepStatus, Workflow,
+                       WorkflowOutcome, WorkflowRecord, WorkflowRunner, WorkflowStep)
+
+__all__ += ["InputBinding", "Literal", "OutputRef", "StepRecord", "StepStatus", "Workflow",
+            "WorkflowOutcome", "WorkflowRecord", "WorkflowRunner", "WorkflowStep"]
