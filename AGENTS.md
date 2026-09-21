@@ -22,3 +22,7 @@ The enclosing ChatGPT project mirror has its own `AGENTS.md` and `sources/` mate
 ## Lab 002 follow-up
 
 Lab 002 was explicitly authorized after the design PR merged. For its invocation boundary, read `docs/labs/lab-002-explicit-capability-invocation.md`, `docs/labs/lab-002-results.md`, and ADR-002/ADR-003. Keep invocation separate from discovery and limit examples to trusted local, side-effect-free functions. The historical bootstrap restriction above is not a prohibition on the authorized Lab 001 and Lab 002 implementations. No subsequent lab is authorized by this note.
+
+## Lab 003 follow-up
+
+Lab 003 was explicitly authorized after Lab 002 merged. Read `docs/labs/lab-003-deterministic-workflow.md`, `docs/labs/lab-003-results.md`, and ADR-004 for sequential composition. Reuse LocalExecutor; keep provider selection, input wiring, and fail-fast outcomes explicit. No planning, branching, parallelism, retries, persistence, or subsequent lab is authorized by this note.
