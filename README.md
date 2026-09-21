@@ -71,4 +71,8 @@ removed = registry.unregister(first.key)  # Removes only this offer.
 registry.register(removed)
 ```
 
-`Requirement` optionally accepts `inputs`, `outputs`, all-of `tags`, and an exact `provider_id`. Specified schemas require exact structural equivalence; omitted schemas impose no shape check. Discovery checks declared contract versions, not implementation versions. See [Lab 001 results](docs/labs/lab-001-results.md) for naming, version grammar, unique keys, error behavior, schema limits, and discussion questions.
+`Requirement` optionally accepts `inputs`, `outputs`, all-of `tags`, and an exact `provider_id`. Specified input schemas require exact structural equivalence. Output requirements allow extra fields: required fields must be guaranteed, and every advertised requested field must have the exact requested type. Optional requested outputs may be absent. An empty output requirement imposes no field needs; omitted schemas impose no shape check. See [ADR-002](docs/architecture/decisions/ADR-002-output-subset-compatibility.md). Discovery checks declared contract versions, not implementation versions. See [Lab 001 results](docs/labs/lab-001-results.md) for naming, version grammar, unique keys, error behavior, schema limits, and discussion questions.
+
+## Next experiment: Lab 002
+
+[Lab 002](docs/labs/lab-002-explicit-capability-invocation.md) is specified but not implemented: one explicitly selected local, side-effect-free invocation with payload validation and a minimal inspectable execution record. [ADR-003](docs/architecture/decisions/ADR-003-bounded-execution-lab.md) records the agreed scope. A deterministic caller precedes any planner or LLM integration; implementation awaits a separate request.

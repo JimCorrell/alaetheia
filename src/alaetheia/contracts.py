@@ -112,7 +112,7 @@ class Field:
 
 @dataclass(frozen=True)
 class Schema:
-    """Closed flat field declarations. Order and explanatory prose do not affect shape."""
+    """Flat field declarations. Matching policy belongs to compatibility, not shape."""
     fields: tuple[Field, ...]
 
     def __post_init__(self) -> None:
@@ -188,6 +188,10 @@ class CapabilityManifest:
 
 @dataclass(frozen=True)
 class Requirement:
+    """Inputs match exactly; outputs describe minimum needs and allow extra fields.
+
+    Optional requested outputs may be absent, but must match type if advertised.
+    """
     capability_id: str
     versions: VersionRange
     inputs: Schema | None = None

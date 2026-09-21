@@ -145,15 +145,58 @@ class Registry(unittest.TestCase):
 
     def test_schema_and_metadata_filters(self):
         self.assertEqual(len(self.registry.find(replace(self.requirement, outputs=EXTENDED_OUTPUT))), 3)
-        self.assertEqual(len(self.registry.find(replace(self.requirement, outputs=OUTPUT))), 1)
+        self.assertEqual(len(self.registry.find(replace(self.requirement, outputs=OUTPUT))), 4)
         self.assertEqual(len(self.registry.find(replace(self.requirement, inputs=INPUT))), 4)
-        for change in ({'inputs': Schema(())}, {'outputs': Schema(())}, {'tags': frozenset({'missing'})}, {'provider_id': 'missing'}, {'capability_id': 'missing'}):
+        for change in ({'inputs': Schema(())}, {'tags': frozenset({'missing'})}, {'provider_id': 'missing'}, {'capability_id': 'missing'}):
             self.assertEqual(self.registry.find(replace(self.requirement, **change)), ())
         self.assertEqual(len(self.registry.find(replace(self.requirement, tags=frozenset({'terrain'}), provider_id='remote-gis'))), 1)
         optional = Schema((replace(OUTPUT.fields[0], required=False),))
-        self.assertFalse(self.registry.find(replace(self.requirement, outputs=optional)))
+        self.assertEqual(len(self.registry.find(replace(self.requirement, outputs=optional))), 4)
         changed_type = Schema((replace(OUTPUT.fields[0], type=FieldType.INTEGER),))
         self.assertFalse(self.registry.find(replace(self.requirement, outputs=changed_type)))
+
+    def test_output_presence_and_type_matrix(self):
+        base = next(o for o in self.registry.list() if str(o.contract.version) == '2.0.0')
+        for requested_required in (False, True):
+            wanted = replace(OUTPUT.fields[0], required=requested_required)
+            requirement = replace(self.requirement, outputs=Schema((wanted,)))
+            for present in (False, True):
+                for offered_required in (False, True):
+                    for field_type in FieldType:
+                        fields = (replace(wanted, required=offered_required, type=field_type),) if present else ()
+                        offer = replace(base, contract=replace(base.contract, outputs=Schema(fields)))
+                        expected = (not requested_required if not present else
+                                    field_type == wanted.type and (not requested_required or offered_required))
+                        with self.subTest(requested_required=requested_required, present=present,
+                                          offered_required=offered_required, field_type=field_type):
+                            result = compatible(requirement, offer)
+                            self.assertEqual(result.matches, expected)
+                            self.assertEqual(bool(result.reasons), not expected)
+                            registry = CapabilityRegistry()
+                            registry.register(offer)
+                            self.assertEqual(registry.find(requirement), (offer,) if expected else ())
+
+    def test_extra_outputs_and_empty_needs(self):
+        for outputs in (OUTPUT, Schema(()), None):
+            self.assertEqual(len(self.registry.find(replace(self.requirement, outputs=outputs))), 4)
+        wanted = Schema(tuple(reversed(EXTENDED_OUTPUT.fields)))
+        self.assertEqual(len(self.registry.find(replace(self.requirement, outputs=wanted))), 3)
+        # Accepting output extras must not relax input checks or major versions.
+        extra_input = Schema(INPUT.fields + (Field('resolution', FieldType.NUMBER, False, 'Resolution.'),))
+        self.assertFalse(self.registry.find(replace(self.requirement, inputs=extra_input, outputs=OUTPUT)))
+        major_three = next(o for o in self.registry.list() if o.contract.version.major == 3)
+        self.assertFalse(compatible(replace(self.requirement, outputs=Schema(())), major_three))
+
+    def test_output_diagnostics(self):
+        base = next(o for o in self.registry.list() if str(o.contract.version) == '2.0.0')
+        requirement = replace(self.requirement, outputs=EXTENDED_OUTPUT)
+        altered = Schema((replace(OUTPUT.fields[0], required=False, type=FieldType.STRING),))
+        offer = replace(base, contract=replace(base.contract, outputs=altered))
+        self.assertEqual(compatible(requirement, offer).reasons, (
+            "output 'max_slope' is required but missing",
+            "output 'mean_slope' type differs: expected number, offered string",
+            "output 'mean_slope' is required but only optional in offer",
+        ))
 
     def test_find_compatible_agree_and_reasons(self):
         for requirement in (self.requirement, replace(self.requirement, outputs=EXTENDED_OUTPUT), replace(self.requirement, tags=frozenset({'missing'}))):
@@ -163,7 +206,7 @@ class Registry(unittest.TestCase):
         self.assertFalse(result)
         self.assertIn('contract version is outside requested range', result.reasons)
         old = next(o for o in self.registry.list() if str(o.contract.version) == '2.0.0')
-        self.assertIn('outputs schema differs (exact shape required)', compatible(replace(self.requirement, outputs=EXTENDED_OUTPUT), old).reasons)
+        self.assertIn("output 'max_slope' is required but missing", compatible(replace(self.requirement, outputs=EXTENDED_OUTPUT), old).reasons)
 
 
 class CLI(unittest.TestCase):

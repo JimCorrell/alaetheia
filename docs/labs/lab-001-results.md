@@ -1,8 +1,10 @@
 # Lab 001 results and discussion
 
+Historical report of the initial Lab 001 implementation. Output compatibility was subsequently refined by [ADR-002](../architecture/decisions/ADR-002-output-subset-compatibility.md); the exact-output results below describe the original experiment.
+
 Implemented within the authorized Lab 001 boundary. The bootstrap prohibition was explicitly lifted by the implementation request. No architecture conflict or scope deviation was required. Example providers are declarations only, as required by the vision; there are no callable implementations.
 
-## Decisions made in this experiment
+## Decisions made in the initial experiment
 
 - Frozen dataclasses, tuples, and frozensets make declarations and returned snapshots immutable. Constructors validate runtime types as well as values. No third-party runtime or test dependency.
 - IDs use lowercase ASCII segments separated by `.`, `_`, or `-`: `[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*`. This applies to capability, provider, implementation, and field names.
@@ -37,3 +39,7 @@ Implemented within the authorized Lab 001 boundary. The bootstrap prohibition wa
 Python 3.12.10: complete standard-library unittest suite (18 test methods with parameterized subcases) passes. Tests cover invalid declarations, range syntax/bounds, immutable data, overlap, exact keys, deterministic sorting, atomic rejection, schema/filter mismatches, compatibility/discovery agreement, and CLI subprocess output/error behavior. No external services are required.
 
 Editable package installation also passed (`python -m pip install -e .`), followed by the complete suite against the installed package. The installed `alaetheia inspect terrain.slope.analyze --version 2.1.0` entry point displayed all three offers. Source compilation and `git diff --check` passed.
+
+## Follow-up: output subsets
+
+The accepted refinement treats output requirements as minimum consumer needs. The one-field slope requirement now returns all four in-range offers, instead of only 2.0.0. Missing required outputs, optional-only guarantees, and type mismatches are rejected with field-specific reasons. Optional requested fields may be absent but must match type when advertised. Empty output needs accept any output shape. Inputs and same-ID/version contract consistency remain exact. The complete suite now contains 21 passing test methods, including a presence/requiredness/type matrix and discovery agreement checks.

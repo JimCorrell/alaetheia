@@ -19,10 +19,24 @@ def compatible(requirement: Requirement, offer: CapabilityManifest) -> Compatibi
         reasons.append('capability ID differs')
     if not requirement.versions.contains(contract.version):
         reasons.append('contract version is outside requested range')
-    for label in ('inputs', 'outputs'):
-        wanted = getattr(requirement, label)
-        if wanted is not None and wanted.shape() != getattr(contract, label).shape():
-            reasons.append(f'{label} schema differs (exact shape required)')
+    if requirement.inputs is not None and requirement.inputs.shape() != contract.inputs.shape():
+        reasons.append('inputs schema differs (exact shape required)')
+    if requirement.outputs is not None:
+        # Output requirements describe consumer needs, not the entire response.
+        # Extra fields are accepted; optional requested fields constrain type only
+        # when advertised. No projection, coercion, or execution happens here.
+        offered = {field.name: field for field in contract.outputs.fields}
+        for wanted in sorted(requirement.outputs.fields, key=lambda field: field.name):
+            actual = offered.get(wanted.name)
+            if actual is None:
+                if wanted.required:
+                    reasons.append(f'output {wanted.name!r} is required but missing')
+                continue
+            if actual.type != wanted.type:
+                reasons.append(f'output {wanted.name!r} type differs: expected '
+                               f'{wanted.type.value}, offered {actual.type.value}')
+            if wanted.required and not actual.required:
+                reasons.append(f'output {wanted.name!r} is required but only optional in offer')
     if not requirement.tags <= offer.metadata.tags:
         reasons.append('required tags are missing')
     if requirement.provider_id is not None and requirement.provider_id != offer.provider_id:
