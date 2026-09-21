@@ -1,6 +1,6 @@
 # Lab 001: Capability contracts and in-memory registry
 
-- **Status:** Specified; implementation not started
+- **Status:** Implemented; see [results and discussion](lab-001-results.md)
 - **Prerequisite:** Read the vision, principles, conceptual model, glossary, and ADR-001.
 - **Question:** How can Theia know what operations are available before any LLM-based discovery or execution exists?
 

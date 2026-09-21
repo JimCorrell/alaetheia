@@ -1,4 +1,8 @@
-"""Alaetheia package marker.
+"""Lab 001: typed contracts and deterministic, in-memory discovery."""
+from .contracts import (CapabilityContract, CapabilityManifest, Field, FieldType,
+                        Metadata, OfferKey, Requirement, Schema, Version, VersionRange)
+from .registry import CapabilityRegistry, Compatibility, compatible
 
-The bootstrap contains no application behavior. See docs/labs/lab-001-capability-registry.md.
-"""
+__all__ = ['CapabilityContract', 'CapabilityManifest', 'Field', 'FieldType',
+           'Metadata', 'OfferKey', 'Requirement', 'Schema', 'Version', 'VersionRange',
+           'CapabilityRegistry', 'Compatibility', 'compatible']

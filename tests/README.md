@@ -1,3 +1,9 @@
-# Tests
+# Lab 001 behavior tests
 
-Lab 001 will add behavior tests for typed contracts, registry operations, compatibility, overlapping providers, and CLI inspection. The bootstrap has no application behavior to test.
+From the repository root after installing the package:
+
+```sh
+python -m unittest discover -s tests -v
+```
+
+Without installation, use `PYTHONPATH=src python -m unittest discover -s tests -v` with Python 3.12+. CLI tests launch subprocesses with the same interpreter. Tests require only the standard library. The catalog contains fictional declarations, not running providers.
