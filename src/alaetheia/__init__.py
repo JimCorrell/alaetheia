@@ -1,4 +1,4 @@
-"""Lab 001: typed contracts and deterministic, in-memory discovery."""
+"""Typed discovery contracts and bounded explicit local invocation."""
 from .contracts import (CapabilityContract, CapabilityManifest, Field, FieldType,
                         Metadata, OfferKey, Requirement, Schema, Version, VersionRange)
 from .registry import CapabilityRegistry, Compatibility, compatible
@@ -6,3 +6,7 @@ from .registry import CapabilityRegistry, Compatibility, compatible
 __all__ = ['CapabilityContract', 'CapabilityManifest', 'Field', 'FieldType',
            'Metadata', 'OfferKey', 'Requirement', 'Schema', 'Version', 'VersionRange',
            'CapabilityRegistry', 'Compatibility', 'compatible']
+
+from .execution import ExecutionRecord, LocalBinding, LocalExecutor, Outcome, validate_payload
+
+__all__ += ["ExecutionRecord", "LocalBinding", "LocalExecutor", "Outcome", "validate_payload"]

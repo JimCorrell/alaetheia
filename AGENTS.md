@@ -18,3 +18,7 @@ When Lab 001 is authorized, follow `docs/labs/lab-001-capability-registry.md`. P
 - Keep the source tree compatible with Python 3.12 or newer. Do not add an agent framework or a dependency solely for convenience during bootstrap.
 
 The enclosing ChatGPT project mirror has its own `AGENTS.md` and `sources/` material. Those managed files are read-only references and are outside this repository.
+
+## Lab 002 follow-up
+
+Lab 002 was explicitly authorized after the design PR merged. For its invocation boundary, read `docs/labs/lab-002-explicit-capability-invocation.md`, `docs/labs/lab-002-results.md`, and ADR-002/ADR-003. Keep invocation separate from discovery and limit examples to trusted local, side-effect-free functions. The historical bootstrap restriction above is not a prohibition on the authorized Lab 001 and Lab 002 implementations. No subsequent lab is authorized by this note.

@@ -1,6 +1,6 @@
 # Lab 002: One explicit capability invocation
 
-- **Status:** Design agreed; implementation not started
+- **Status:** Implemented; see [results and discussion](lab-002-results.md)
 - **Prerequisites:** Merged Lab 001 and ADR-002 output compatibility refinement
 - **Decision:** [ADR-003](../architecture/decisions/ADR-003-bounded-execution-lab.md)
 - **Question:** Can a deterministic caller explicitly select and execute one capability, validate the exchange, and return an inspectable execution record?
@@ -29,3 +29,7 @@ Tests should demonstrate:
 ## Boundary
 
 No LLM, supervisor, planner, worker agents, automatic provider ranking, remote execution, side-effecting examples, persistent storage, runtime memory, distributed infrastructure, or web UI. This is one bounded invocation, not a plan execution system. This document records design approval, not authorization to implement Lab 002 in the current PR.
+
+## Implementation handoff completed
+
+The original design-only boundary above applied to PR #2. A subsequent explicit implementation request authorized this lab. The implementation and its payload/record choices are documented in [Lab 002 results](lab-002-results.md). Further experiments still require their own scope.

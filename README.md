@@ -6,7 +6,7 @@ The first architectural hypothesis is **one reasoning supervisor with a registry
 
 ## Current state
 
-Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. No capabilities are executed. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
+Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
 ## Read in order
 
@@ -21,6 +21,7 @@ Lab 001 is implemented: immutable typed capability declarations, an in-memory re
 | Horizon | Components | Status |
 | --- | --- | --- |
 | NOW | Typed capability contracts and in-memory capability registry | Implemented in Lab 001 |
+| NOW | Explicit local invocation and process-local outcome record | Implemented in Lab 002 |
 | NEXT | Theia supervisor, planning, execution loop, execution ledger | Planned experiments; no implementation authority yet |
 | LATER / UNPROVEN | Worker agents, agent registry, knowledge graph, vector memory, message bus, distributed runtime | Hypotheses requiring evidence |
 
@@ -73,6 +74,23 @@ registry.register(removed)
 
 `Requirement` optionally accepts `inputs`, `outputs`, all-of `tags`, and an exact `provider_id`. Specified input schemas require exact structural equivalence. Output requirements allow extra fields: required fields must be guaranteed, and every advertised requested field must have the exact requested type. Optional requested outputs may be absent. An empty output requirement imposes no field needs; omitted schemas impose no shape check. See [ADR-002](docs/architecture/decisions/ADR-002-output-subset-compatibility.md). Discovery checks declared contract versions, not implementation versions. See [Lab 001 results](docs/labs/lab-001-results.md) for naming, version grammar, unique keys, error behavior, schema limits, and discussion questions.
 
-## Next experiment: Lab 002
+## Run Lab 002
 
-[Lab 002](docs/labs/lab-002-explicit-capability-invocation.md) is specified but not implemented: one explicitly selected local, side-effect-free invocation with payload validation and a minimal inspectable execution record. [ADR-003](docs/architecture/decisions/ADR-003-bounded-execution-lab.md) records the agreed scope. A deterministic caller precedes any planner or LLM integration; implementation awaits a separate request.
+[Lab 002](docs/labs/lab-002-explicit-capability-invocation.md) implements one explicitly selected local invocation. [ADR-003](docs/architecture/decisions/ADR-003-bounded-execution-lab.md) records its scope; [results and design choices](docs/labs/lab-002-results.md) explain validation, binding lifecycle, record contents, and open questions.
+
+```sh
+.venv/bin/python -m alaetheia.invocation_example
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+The example uses two side-effect-free character-count functions and explicitly selects `local-python/iterated`. It prints a successful record with `count: 5` and the extra `method: iteration` field. `execution.py` contains the invocation boundary; `invocation_example.py` is the deterministic caller; `tests/test_lab002.py` covers its behavior. No changes to the Lab 001 CLI commands are required.
+
+```python
+from alaetheia.invocation_example import example
+
+registry, executor, requirement, selected_key = example()
+record = executor.invoke(selected_key, requirement, {'text': 'Theia'})
+print(record.outcome.value, record.outputs)
+```
+
+The outcome is `success`, `selection_rejected`, `invalid_input`, `provider_failure`, or `invalid_output`. Discovery never selects an implementation automatically. Bindings refer to exact manifests and must be rebuilt after an implementation replacement. Input fields are closed; additional outputs are retained. Optional fields may be absent but may not be `None`. See the results document for precise scalar rules and limitations.
