@@ -61,3 +61,7 @@ No LLM integration; no supervisor implementation; no agents or agent registry; n
 ## Handoff for the next session
 
 This document authorizes no implementation in the bootstrap session. In a later Lab 001 implementation session, create the types, registry, CLI, tests, and usage documentation within the boundaries above. Report the compatibility rules chosen, commands run, test results, and any unresolved ambiguity before proposing Lab 002.
+
+## Accepted compatibility refinement
+
+Following the initial experiment, [ADR-002](../architecture/decisions/ADR-002-output-subset-compatibility.md) permits extra output fields. Input matching remains exact; required output presence and exact field types remain enforced. The registry still rejects inconsistent schemas under one capability ID/version.
