@@ -1,0 +1,1645 @@
+{
+  "cases": [
+    {
+      "case": {
+        "case_id": "raw-1",
+        "category": "raw",
+        "expected": "text-count-raw",
+        "inputs": {
+          "text": "  Theia  "
+        },
+        "rationale": "Explicit raw policy.",
+        "request": "Count characters including surrounding whitespace.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "text": "  Theia  "
+        },
+        "kind": "select",
+        "workflow_id": "text-count-raw"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "text": "  Theia  "
+          },
+          "workflow_id": "text-count-raw"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "raw-2",
+        "category": "raw",
+        "expected": "text-count-raw",
+        "inputs": {
+          "text": ""
+        },
+        "rationale": "Empty text is a supplied string.",
+        "request": "Count raw characters.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "text": ""
+        },
+        "kind": "select",
+        "workflow_id": "text-count-raw"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "text": ""
+          },
+          "workflow_id": "text-count-raw"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "raw-3",
+        "category": "raw",
+        "expected": "text-count-raw",
+        "inputs": {
+          "text": " é👩‍💻 "
+        },
+        "rationale": "Code points, not visual characters.",
+        "request": "How many Unicode code points, keeping whitespace?",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "text": " é👩‍💻 "
+        },
+        "kind": "select",
+        "workflow_id": "text-count-raw"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "text": " é👩‍💻 "
+          },
+          "workflow_id": "text-count-raw"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "raw-4",
+        "category": "raw",
+        "expected": "text-count-raw",
+        "inputs": {
+          "text": " x "
+        },
+        "rationale": "Paraphrased raw policy.",
+        "request": "Measure the character length without removing the spaces at either end.",
+        "split": "held-out"
+      },
+      "corrections": [
+        "decision"
+      ],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": false,
+      "exact_selection": false,
+      "expected_selection": true,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "trimmed-1",
+        "category": "trimmed",
+        "expected": "text-count-trimmed",
+        "inputs": {
+          "text": "  Theia  "
+        },
+        "rationale": "Explicit trim policy.",
+        "request": "Count characters after trimming.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "text": "  Theia  "
+        },
+        "kind": "select",
+        "workflow_id": "text-count-trimmed"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "text": "  Theia  "
+          },
+          "workflow_id": "text-count-trimmed"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "trimmed-2",
+        "category": "trimmed",
+        "expected": "text-count-trimmed",
+        "inputs": {
+          "text": "\t\n"
+        },
+        "rationale": "Whitespace-only string is valid.",
+        "request": "Count characters without surrounding whitespace.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "text": "\t\n"
+        },
+        "kind": "select",
+        "workflow_id": "text-count-trimmed"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "text": "\t\n"
+          },
+          "workflow_id": "text-count-trimmed"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "trimmed-3",
+        "category": "trimmed",
+        "expected": "text-count-trimmed",
+        "inputs": {
+          "text": " é "
+        },
+        "rationale": "Combining mark is a separate code point.",
+        "request": "Count Unicode code points after trimming.",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "text": " é "
+        },
+        "kind": "select",
+        "workflow_id": "text-count-trimmed"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "text": " é "
+          },
+          "workflow_id": "text-count-trimmed"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "trimmed-4",
+        "category": "trimmed",
+        "expected": "text-count-trimmed",
+        "inputs": {
+          "text": " x "
+        },
+        "rationale": "Paraphrased trim policy.",
+        "request": "Remove the whitespace at both ends and tell me the character length.",
+        "split": "held-out"
+      },
+      "corrections": [
+        "decision"
+      ],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": false,
+      "exact_selection": false,
+      "expected_selection": true,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "parcel-1",
+        "category": "parcel",
+        "expected": "parcel-record-summary",
+        "inputs": {
+          "acreage": 12,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "rationale": "Supplied facts only, false preserved.",
+        "request": "Summarize the supplied parcel record.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "acreage": 12,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "kind": "select",
+        "workflow_id": "parcel-record-summary"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "acreage": 12,
+            "municipality": "Example Town",
+            "parcel_id": " P-1 ",
+            "road_access": false
+          },
+          "workflow_id": "parcel-record-summary"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "parcel-2",
+        "category": "parcel",
+        "expected": "parcel-record-summary",
+        "inputs": {
+          "acreage": -1,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "rationale": "Domain-invalid data does not trigger a provider call.",
+        "request": "Summarize this parcel record.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "acreage": -1,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "kind": "select",
+        "workflow_id": "parcel-record-summary"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "acreage": -1,
+            "municipality": "Example Town",
+            "parcel_id": " P-1 ",
+            "road_access": false
+          },
+          "workflow_id": "parcel-record-summary"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "parcel-3",
+        "category": "parcel",
+        "expected": "parcel-record-summary",
+        "inputs": {
+          "acreage": 0,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "rationale": "Zero remains supplied, with domain validity deferred.",
+        "request": "Describe these supplied parcel facts.",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": false,
+      "emitted_selection": true,
+      "exact_reason": false,
+      "exact_selection": true,
+      "expected_selection": true,
+      "raw_proposal": {
+        "inputs": {
+          "acreage": 0,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "kind": "select",
+        "workflow_id": "parcel-record-summary"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "inputs": {
+            "acreage": 0,
+            "municipality": "Example Town",
+            "parcel_id": " P-1 ",
+            "road_access": false
+          },
+          "workflow_id": "parcel-record-summary"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "parcel-4",
+        "category": "parcel",
+        "expected": "parcel-record-summary",
+        "inputs": {
+          "acreage": 0.25,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "rationale": "Paraphrase of supplied-record summary.",
+        "request": "Give me a descriptive digest of this supplied land record.",
+        "split": "held-out"
+      },
+      "corrections": [
+        "decision"
+      ],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": false,
+      "exact_selection": false,
+      "expected_selection": true,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "ambiguous-1",
+        "category": "ambiguous",
+        "expected": "ambiguous_request",
+        "inputs": {
+          "text": " x "
+        },
+        "rationale": "No whitespace policy.",
+        "request": "Count the characters.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "ambiguous_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "ambiguous_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "ambiguous-2",
+        "category": "ambiguous",
+        "expected": "ambiguous_request",
+        "inputs": {
+          "text": " x "
+        },
+        "rationale": "Two requested operations.",
+        "request": "Count raw characters and count characters after trimming.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "ambiguous_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "ambiguous_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "ambiguous-3",
+        "category": "ambiguous",
+        "expected": "ambiguous_request",
+        "inputs": {
+          "acreage": 12,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false,
+          "text": " x "
+        },
+        "rationale": "Two workflow intents take precedence over envelope issues.",
+        "request": "Count raw characters and summarize this parcel record.",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "ambiguous_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "ambiguous_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "ambiguous-4",
+        "category": "ambiguous",
+        "expected": "ambiguous_request",
+        "inputs": {
+          "text": " x "
+        },
+        "rationale": "Counting semantics and whitespace policy unresolved.",
+        "request": "How long is this text?",
+        "split": "held-out"
+      },
+      "corrections": [
+        "decision"
+      ],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": false,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "unsupported-1",
+        "category": "unsupported",
+        "expected": "unsupported_request",
+        "inputs": {
+          "acreage": 12,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "rationale": "External lookup is unavailable.",
+        "request": "Look up this parcel and summarize it.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "unsupported-2",
+        "category": "unsupported",
+        "expected": "unsupported_request",
+        "inputs": {
+          "text": "one two"
+        },
+        "rationale": "Word counting is not character counting.",
+        "request": "Count words including surrounding whitespace.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "unsupported-3",
+        "category": "unsupported",
+        "expected": "unsupported_request",
+        "inputs": {
+          "text": "é"
+        },
+        "rationale": "Byte count differs from code points.",
+        "request": "Count UTF-8 bytes including surrounding whitespace.",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "unsupported-4",
+        "category": "unsupported",
+        "expected": "unsupported_request",
+        "inputs": {
+          "text": "é"
+        },
+        "rationale": "Grapheme count differs from code points.",
+        "request": "Count graphemes after trimming.",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "unsupported_request"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "unsupported_request"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "insufficient-1",
+        "category": "insufficient",
+        "expected": "insufficient_inputs",
+        "inputs": {},
+        "rationale": "Missing required text.",
+        "request": "Count raw characters.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "insufficient_inputs"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "insufficient_inputs"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "insufficient-2",
+        "category": "insufficient",
+        "expected": "insufficient_inputs",
+        "inputs": {
+          "text": false
+        },
+        "rationale": "False must not become text.",
+        "request": "Count characters after trimming.",
+        "split": "development"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "insufficient_inputs"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "insufficient_inputs"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "insufficient-3",
+        "category": "insufficient",
+        "expected": "insufficient_inputs",
+        "inputs": {
+          "acreage": 12,
+          "municipality": "Example Town",
+          "parcel_id": " P-1 "
+        },
+        "rationale": "Missing access flag must not default to false.",
+        "request": "Summarize this parcel record.",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "insufficient_inputs"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "insufficient_inputs"
+        }
+      }
+    },
+    {
+      "case": {
+        "case_id": "insufficient-4",
+        "category": "insufficient",
+        "expected": "insufficient_inputs",
+        "inputs": {
+          "acreage": "12",
+          "municipality": "Example Town",
+          "parcel_id": " P-1 ",
+          "road_access": false
+        },
+        "rationale": "No numeric coercion.",
+        "request": "Summarize this parcel record.",
+        "split": "held-out"
+      },
+      "corrections": [],
+      "emitted_abstention": true,
+      "emitted_selection": false,
+      "exact_reason": true,
+      "exact_selection": false,
+      "expected_selection": false,
+      "raw_proposal": {
+        "kind": "abstain",
+        "reason": "insufficient_inputs"
+      },
+      "validation": {
+        "diagnostics": [],
+        "proposal": {
+          "reason": "insufficient_inputs"
+        }
+      }
+    }
+  ],
+  "catalog": [
+    {
+      "description": "Count Unicode code points including surrounding whitespace.",
+      "manifests": [
+        {
+          "contract": {
+            "capability_id": "text.count",
+            "inputs": {
+              "fields": [
+                {
+                  "name": "text",
+                  "required": true,
+                  "semantics": "Supplied text; no coercion.",
+                  "type": "string"
+                }
+              ]
+            },
+            "outputs": {
+              "fields": [
+                {
+                  "name": "count",
+                  "required": true,
+                  "semantics": "Strip surrounding whitespace or count Unicode code points.",
+                  "type": "integer"
+                }
+              ]
+            },
+            "version": {
+              "major": 1,
+              "minor": 0,
+              "patch": 0
+            }
+          },
+          "implementation_id": "direct",
+          "implementation_version": {
+            "major": 1,
+            "minor": 0,
+            "patch": 0
+          },
+          "metadata": {
+            "description": "Pure local text function.",
+            "permissions": [],
+            "side_effects": [],
+            "source": "alaetheia.workflow_example",
+            "tags": [
+              "text"
+            ]
+          },
+          "provider_id": "local-python"
+        }
+      ],
+      "workflow": {
+        "inputs": {
+          "fields": [
+            {
+              "name": "text",
+              "required": true,
+              "semantics": "Supplied text; no coercion.",
+              "type": "string"
+            }
+          ]
+        },
+        "steps": [
+          {
+            "inputs": [
+              {
+                "field": "text",
+                "source": {
+                  "field": "text"
+                }
+              }
+            ],
+            "requirement": {
+              "capability_id": "text.count",
+              "inputs": {
+                "fields": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "semantics": "Supplied text; no coercion.",
+                    "type": "string"
+                  }
+                ]
+              },
+              "outputs": {
+                "fields": [
+                  {
+                    "name": "count",
+                    "required": true,
+                    "semantics": "Strip surrounding whitespace or count Unicode code points.",
+                    "type": "integer"
+                  }
+                ]
+              },
+              "provider_id": null,
+              "tags": [],
+              "versions": {
+                "include_lower": true,
+                "include_upper": true,
+                "lower": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                },
+                "upper": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                }
+              }
+            },
+            "selected_key": {
+              "capability_id": "text.count",
+              "contract_version": {
+                "major": 1,
+                "minor": 0,
+                "patch": 0
+              },
+              "implementation_id": "direct",
+              "provider_id": "local-python"
+            },
+            "step_id": "count"
+          }
+        ],
+        "workflow_id": "text-count-raw"
+      }
+    },
+    {
+      "description": "Strip surrounding whitespace, then count Unicode code points.",
+      "manifests": [
+        {
+          "contract": {
+            "capability_id": "text.strip",
+            "inputs": {
+              "fields": [
+                {
+                  "name": "text",
+                  "required": true,
+                  "semantics": "Supplied text; no coercion.",
+                  "type": "string"
+                }
+              ]
+            },
+            "outputs": {
+              "fields": [
+                {
+                  "name": "cleaned",
+                  "required": true,
+                  "semantics": "Strip surrounding whitespace or count Unicode code points.",
+                  "type": "string"
+                }
+              ]
+            },
+            "version": {
+              "major": 1,
+              "minor": 0,
+              "patch": 0
+            }
+          },
+          "implementation_id": "direct",
+          "implementation_version": {
+            "major": 1,
+            "minor": 0,
+            "patch": 0
+          },
+          "metadata": {
+            "description": "Pure local text function.",
+            "permissions": [],
+            "side_effects": [],
+            "source": "alaetheia.workflow_example",
+            "tags": [
+              "text"
+            ]
+          },
+          "provider_id": "local-python"
+        },
+        {
+          "contract": {
+            "capability_id": "text.count",
+            "inputs": {
+              "fields": [
+                {
+                  "name": "text",
+                  "required": true,
+                  "semantics": "Supplied text; no coercion.",
+                  "type": "string"
+                }
+              ]
+            },
+            "outputs": {
+              "fields": [
+                {
+                  "name": "count",
+                  "required": true,
+                  "semantics": "Strip surrounding whitespace or count Unicode code points.",
+                  "type": "integer"
+                }
+              ]
+            },
+            "version": {
+              "major": 1,
+              "minor": 0,
+              "patch": 0
+            }
+          },
+          "implementation_id": "direct",
+          "implementation_version": {
+            "major": 1,
+            "minor": 0,
+            "patch": 0
+          },
+          "metadata": {
+            "description": "Pure local text function.",
+            "permissions": [],
+            "side_effects": [],
+            "source": "alaetheia.workflow_example",
+            "tags": [
+              "text"
+            ]
+          },
+          "provider_id": "local-python"
+        }
+      ],
+      "workflow": {
+        "inputs": {
+          "fields": [
+            {
+              "name": "text",
+              "required": true,
+              "semantics": "Supplied text; no coercion.",
+              "type": "string"
+            }
+          ]
+        },
+        "steps": [
+          {
+            "inputs": [
+              {
+                "field": "text",
+                "source": {
+                  "field": "text"
+                }
+              }
+            ],
+            "requirement": {
+              "capability_id": "text.strip",
+              "inputs": {
+                "fields": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "semantics": "Supplied text; no coercion.",
+                    "type": "string"
+                  }
+                ]
+              },
+              "outputs": {
+                "fields": [
+                  {
+                    "name": "cleaned",
+                    "required": true,
+                    "semantics": "Strip surrounding whitespace or count Unicode code points.",
+                    "type": "string"
+                  }
+                ]
+              },
+              "provider_id": null,
+              "tags": [],
+              "versions": {
+                "include_lower": true,
+                "include_upper": true,
+                "lower": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                },
+                "upper": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                }
+              }
+            },
+            "selected_key": {
+              "capability_id": "text.strip",
+              "contract_version": {
+                "major": 1,
+                "minor": 0,
+                "patch": 0
+              },
+              "implementation_id": "direct",
+              "provider_id": "local-python"
+            },
+            "step_id": "strip"
+          },
+          {
+            "inputs": [
+              {
+                "field": "text",
+                "source": {
+                  "field": "cleaned",
+                  "step_id": "strip"
+                }
+              }
+            ],
+            "requirement": {
+              "capability_id": "text.count",
+              "inputs": {
+                "fields": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "semantics": "Supplied text; no coercion.",
+                    "type": "string"
+                  }
+                ]
+              },
+              "outputs": {
+                "fields": [
+                  {
+                    "name": "count",
+                    "required": true,
+                    "semantics": "Strip surrounding whitespace or count Unicode code points.",
+                    "type": "integer"
+                  }
+                ]
+              },
+              "provider_id": null,
+              "tags": [],
+              "versions": {
+                "include_lower": true,
+                "include_upper": true,
+                "lower": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                },
+                "upper": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                }
+              }
+            },
+            "selected_key": {
+              "capability_id": "text.count",
+              "contract_version": {
+                "major": 1,
+                "minor": 0,
+                "patch": 0
+              },
+              "implementation_id": "direct",
+              "provider_id": "local-python"
+            },
+            "step_id": "count"
+          }
+        ],
+        "workflow_id": "text-count-trimmed"
+      }
+    },
+    {
+      "description": "Summarize supplied parcel facts; no lookup, verification, or suitability assessment.",
+      "manifests": [
+        {
+          "contract": {
+            "capability_id": "parcel.record.validate",
+            "inputs": {
+              "fields": [
+                {
+                  "name": "parcel_id",
+                  "required": true,
+                  "semantics": "User-supplied parcel identifier; no external verification.",
+                  "type": "string"
+                },
+                {
+                  "name": "municipality",
+                  "required": true,
+                  "semantics": "User-supplied municipality name.",
+                  "type": "string"
+                },
+                {
+                  "name": "acreage",
+                  "required": true,
+                  "semantics": "User-supplied area in acres; must be positive.",
+                  "type": "number"
+                },
+                {
+                  "name": "road_access",
+                  "required": true,
+                  "semantics": "User-reported road access; not a legal access determination.",
+                  "type": "boolean"
+                }
+              ]
+            },
+            "outputs": {
+              "fields": [
+                {
+                  "name": "parcel_id",
+                  "required": true,
+                  "semantics": "User-supplied parcel identifier; no external verification.",
+                  "type": "string"
+                },
+                {
+                  "name": "municipality",
+                  "required": true,
+                  "semantics": "User-supplied municipality name.",
+                  "type": "string"
+                },
+                {
+                  "name": "acreage",
+                  "required": true,
+                  "semantics": "User-supplied area in acres; must be positive.",
+                  "type": "number"
+                },
+                {
+                  "name": "road_access",
+                  "required": true,
+                  "semantics": "User-reported road access; not a legal access determination.",
+                  "type": "boolean"
+                }
+              ]
+            },
+            "version": {
+              "major": 2,
+              "minor": 0,
+              "patch": 0
+            }
+          },
+          "implementation_id": "direct",
+          "implementation_version": {
+            "major": 2,
+            "minor": 0,
+            "patch": 0
+          },
+          "metadata": {
+            "description": "Pure supplied-record example; no parcel lookup or suitability assessment.",
+            "permissions": [],
+            "side_effects": [],
+            "source": "alaetheia.parcel_example",
+            "tags": [
+              "parcel"
+            ]
+          },
+          "provider_id": "local-python"
+        },
+        {
+          "contract": {
+            "capability_id": "parcel.record.summarize",
+            "inputs": {
+              "fields": [
+                {
+                  "name": "parcel_id",
+                  "required": true,
+                  "semantics": "User-supplied parcel identifier; no external verification.",
+                  "type": "string"
+                },
+                {
+                  "name": "municipality",
+                  "required": true,
+                  "semantics": "User-supplied municipality name.",
+                  "type": "string"
+                },
+                {
+                  "name": "acreage",
+                  "required": true,
+                  "semantics": "User-supplied area in acres; must be positive.",
+                  "type": "number"
+                },
+                {
+                  "name": "road_access",
+                  "required": true,
+                  "semantics": "User-reported road access; not a legal access determination.",
+                  "type": "boolean"
+                }
+              ]
+            },
+            "outputs": {
+              "fields": [
+                {
+                  "name": "summary",
+                  "required": true,
+                  "semantics": "Descriptive summary of supplied data only.",
+                  "type": "string"
+                }
+              ]
+            },
+            "version": {
+              "major": 1,
+              "minor": 0,
+              "patch": 0
+            }
+          },
+          "implementation_id": "direct",
+          "implementation_version": {
+            "major": 1,
+            "minor": 0,
+            "patch": 0
+          },
+          "metadata": {
+            "description": "Pure supplied-record example; no parcel lookup or suitability assessment.",
+            "permissions": [],
+            "side_effects": [],
+            "source": "alaetheia.parcel_example",
+            "tags": [
+              "parcel"
+            ]
+          },
+          "provider_id": "local-python"
+        }
+      ],
+      "workflow": {
+        "inputs": {
+          "fields": [
+            {
+              "name": "parcel_id",
+              "required": true,
+              "semantics": "User-supplied parcel identifier; no external verification.",
+              "type": "string"
+            },
+            {
+              "name": "municipality",
+              "required": true,
+              "semantics": "User-supplied municipality name.",
+              "type": "string"
+            },
+            {
+              "name": "acreage",
+              "required": true,
+              "semantics": "User-supplied area in acres; must be positive.",
+              "type": "number"
+            },
+            {
+              "name": "road_access",
+              "required": true,
+              "semantics": "User-reported road access; not a legal access determination.",
+              "type": "boolean"
+            }
+          ]
+        },
+        "steps": [
+          {
+            "inputs": [
+              {
+                "field": "parcel_id",
+                "source": {
+                  "field": "parcel_id"
+                }
+              },
+              {
+                "field": "municipality",
+                "source": {
+                  "field": "municipality"
+                }
+              },
+              {
+                "field": "acreage",
+                "source": {
+                  "field": "acreage"
+                }
+              },
+              {
+                "field": "road_access",
+                "source": {
+                  "field": "road_access"
+                }
+              }
+            ],
+            "requirement": {
+              "capability_id": "parcel.record.validate",
+              "inputs": {
+                "fields": [
+                  {
+                    "name": "parcel_id",
+                    "required": true,
+                    "semantics": "User-supplied parcel identifier; no external verification.",
+                    "type": "string"
+                  },
+                  {
+                    "name": "municipality",
+                    "required": true,
+                    "semantics": "User-supplied municipality name.",
+                    "type": "string"
+                  },
+                  {
+                    "name": "acreage",
+                    "required": true,
+                    "semantics": "User-supplied area in acres; must be positive.",
+                    "type": "number"
+                  },
+                  {
+                    "name": "road_access",
+                    "required": true,
+                    "semantics": "User-reported road access; not a legal access determination.",
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "outputs": {
+                "fields": [
+                  {
+                    "name": "parcel_id",
+                    "required": true,
+                    "semantics": "User-supplied parcel identifier; no external verification.",
+                    "type": "string"
+                  },
+                  {
+                    "name": "municipality",
+                    "required": true,
+                    "semantics": "User-supplied municipality name.",
+                    "type": "string"
+                  },
+                  {
+                    "name": "acreage",
+                    "required": true,
+                    "semantics": "User-supplied area in acres; must be positive.",
+                    "type": "number"
+                  },
+                  {
+                    "name": "road_access",
+                    "required": true,
+                    "semantics": "User-reported road access; not a legal access determination.",
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "provider_id": null,
+              "tags": [],
+              "versions": {
+                "include_lower": true,
+                "include_upper": true,
+                "lower": {
+                  "major": 2,
+                  "minor": 0,
+                  "patch": 0
+                },
+                "upper": {
+                  "major": 2,
+                  "minor": 0,
+                  "patch": 0
+                }
+              }
+            },
+            "selected_key": {
+              "capability_id": "parcel.record.validate",
+              "contract_version": {
+                "major": 2,
+                "minor": 0,
+                "patch": 0
+              },
+              "implementation_id": "direct",
+              "provider_id": "local-python"
+            },
+            "step_id": "validate"
+          },
+          {
+            "inputs": [
+              {
+                "field": "parcel_id",
+                "source": {
+                  "field": "parcel_id",
+                  "step_id": "validate"
+                }
+              },
+              {
+                "field": "municipality",
+                "source": {
+                  "field": "municipality",
+                  "step_id": "validate"
+                }
+              },
+              {
+                "field": "acreage",
+                "source": {
+                  "field": "acreage",
+                  "step_id": "validate"
+                }
+              },
+              {
+                "field": "road_access",
+                "source": {
+                  "field": "road_access",
+                  "step_id": "validate"
+                }
+              }
+            ],
+            "requirement": {
+              "capability_id": "parcel.record.summarize",
+              "inputs": {
+                "fields": [
+                  {
+                    "name": "parcel_id",
+                    "required": true,
+                    "semantics": "User-supplied parcel identifier; no external verification.",
+                    "type": "string"
+                  },
+                  {
+                    "name": "municipality",
+                    "required": true,
+                    "semantics": "User-supplied municipality name.",
+                    "type": "string"
+                  },
+                  {
+                    "name": "acreage",
+                    "required": true,
+                    "semantics": "User-supplied area in acres; must be positive.",
+                    "type": "number"
+                  },
+                  {
+                    "name": "road_access",
+                    "required": true,
+                    "semantics": "User-reported road access; not a legal access determination.",
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "outputs": {
+                "fields": [
+                  {
+                    "name": "summary",
+                    "required": true,
+                    "semantics": "Descriptive summary of supplied data only.",
+                    "type": "string"
+                  }
+                ]
+              },
+              "provider_id": null,
+              "tags": [],
+              "versions": {
+                "include_lower": true,
+                "include_upper": true,
+                "lower": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                },
+                "upper": {
+                  "major": 1,
+                  "minor": 0,
+                  "patch": 0
+                }
+              }
+            },
+            "selected_key": {
+              "capability_id": "parcel.record.summarize",
+              "contract_version": {
+                "major": 1,
+                "minor": 0,
+                "patch": 0
+              },
+              "implementation_id": "direct",
+              "provider_id": "local-python"
+            },
+            "step_id": "summarize"
+          }
+        ],
+        "workflow_id": "parcel-record-summary"
+      }
+    }
+  ],
+  "metrics": {
+    "development": {
+      "abstention_reason_accuracy": {
+        "denominator": 6,
+        "numerator": 6
+      },
+      "abstention_recall": {
+        "denominator": 6,
+        "numerator": 6
+      },
+      "correction_cases": {
+        "denominator": 12,
+        "numerator": 0
+      },
+      "exact_selection": {
+        "denominator": 6,
+        "numerator": 6
+      },
+      "input_fidelity": {
+        "denominator": 6,
+        "numerator": 6
+      },
+      "invalid_proposals": {
+        "denominator": 12,
+        "numerator": 0
+      },
+      "unknown_ids": {
+        "denominator": 12,
+        "numerator": 0
+      },
+      "unnecessary_abstention": {
+        "denominator": 6,
+        "numerator": 0
+      }
+    },
+    "held-out": {
+      "abstention_reason_accuracy": {
+        "denominator": 6,
+        "numerator": 5
+      },
+      "abstention_recall": {
+        "denominator": 6,
+        "numerator": 6
+      },
+      "correction_cases": {
+        "denominator": 12,
+        "numerator": 4
+      },
+      "exact_selection": {
+        "denominator": 6,
+        "numerator": 3
+      },
+      "input_fidelity": {
+        "denominator": 3,
+        "numerator": 3
+      },
+      "invalid_proposals": {
+        "denominator": 12,
+        "numerator": 0
+      },
+      "unknown_ids": {
+        "denominator": 12,
+        "numerator": 0
+      },
+      "unnecessary_abstention": {
+        "denominator": 6,
+        "numerator": 3
+      }
+    }
+  },
+  "revisions": {
+    "baseline": "1",
+    "catalog": "1",
+    "evaluation": "1",
+    "fixtures": "1"
+  },
+  "scope": "Offline proposals only; no execution or domain validation. Synthetic single-author labels.",
+  "source_sha256": {
+    "alaetheia.selection": "1c280b8257183ac12ef303c77b1ff14608495609127f0963128fec98533fae6f",
+    "alaetheia.selection_baseline": "dcd8239f0b3cba79fc9fc59055b44b3cf25a3a400cd99c0d6ed4de74558bef76",
+    "alaetheia.selection_catalog": "28f5c7b732d9d17b77007e6624b039ddb397e5a8d516a1add9b016ca8a09f77d",
+    "alaetheia.selection_evaluation": "4128bde3c093a223393e0aeeb0b3cf87ec6b8c93537f4f14590fadfc5f1a3ac5",
+    "alaetheia.selection_fixtures": "32d7bcd9f995736af2787a11721534f21b88a52cb89a2ac846d06e5f75b00f88"
+  }
+}

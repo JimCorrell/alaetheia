@@ -1,6 +1,6 @@
 # Current architecture and public contract
 
-This is the current implementation reference after Labs 001–006 and the architecture-review fixes. The [principles](principles.md) remain governing constraints. ADRs record why decisions changed; lab results preserve experimental history rather than defining the current API independently.
+This is the current implementation reference after Labs 001–006, the architecture-review fixes, and Lab 007 Phase A. The [principles](principles.md) remain governing constraints. ADRs record why decisions changed; lab results preserve experimental history rather than defining the current API independently.
 
 ## Implemented boundary
 
@@ -79,6 +79,14 @@ Preflight reports errors, risks, or no_detected_issues for the definition and cu
 
 Run comparison is an explicit local action. It requires equal workflow definitions, but does not guarantee the same registry revision. Missing-output events distinguish required provider omissions from absent optional references. Skipped consumers are not counted again. Domain rejection deliberately has no successful output and generates no missing-output event.
 
+## Offline proposal evaluation (Lab 007 Phase A)
+
+A separate experiment selects among three predefined workflows: raw text count, trimmed text count, and supplied parcel summary. It accepts a request plus separately supplied structured inputs. The deterministic phrase baseline emits a selection with unchanged inputs or a typed abstention reason. A closed data validator checks catalog membership, scalar input contracts, and type-sensitive fidelity; authored fixture labels assess semantic correctness separately. Neither validates domain meaning or predicts execution success.
+
+The evaluator has no executor or callable bindings. It never invokes providers, generates workflow wiring, or grants permission to execute. Existing runtime and preflight behavior are unchanged. A small explicit tuple retains full definitions and manifests; it is not a new registry subsystem. The local example prints results and evidence, with no automatic persistence. Checked-in experiment evidence is distinct from runtime memory or a ledger.
+
+The 24 synthetic cases have separate development and held-out groups but a single author, not independent blinding. Four held-out decision corrections remain visible. See [results](../labs/lab-007-results.md); live-model comparison is deferred.
+
 ## Implementation map
 
 | Module | Responsibility |
@@ -89,6 +97,8 @@ Run comparison is an explicit local action. It requires equal workflow definitio
 | execution.py | Shared selection checks, invocation, validation, records |
 | workflow.py | Typed definitions, envelope checks, sequential composition |
 | preflight.py | Advisory analysis and explicit run comparison |
+| selection.py / selection_catalog.py | Closed proposal validation and fixed workflow declarations |
+| selection_baseline.py / selection_fixtures.py / selection_evaluation.py | Offline phrase baseline, authored cases, and evaluation metrics |
 | cli.py | Sample catalog inspection only |
 | *_example.py | Explicit local demonstrations, not generic external protocols |
 
@@ -100,7 +110,7 @@ The configured matrix is the explicit CI target, not evidence that a particular 
 
 ## Horizons and supersession
 
-Labs 001–006 and review consolidation are implemented. [Lab 007](../labs/lab-007-proposal-only-selection.md) now has a scoped design under [ADR-009](decisions/ADR-009-proposal-only-selection.md): an offline baseline for proposals selecting predefined workflows, with separately supplied inputs and no execution. Its implementation remains deferred. Live-model comparison requires a separate scope decision after baseline review. Supervisors, dynamic planning, external providers, side effects, persistence, agents, distributed infrastructure, and web UI remain unimplemented and unauthorized by this reference.
+Labs 001–006, review consolidation, and [Lab 007 Phase A](../labs/lab-007-proposal-only-selection.md) are implemented under [ADR-009](decisions/ADR-009-proposal-only-selection.md): an offline baseline for proposals selecting predefined workflows, with separately supplied inputs and no execution. Live-model comparison requires a separate scope decision after baseline review. Supervisors, dynamic planning, external providers, side effects, persistence, agents, distributed infrastructure, and web UI remain unimplemented and unauthorized by this reference.
 
 - ADR-002 supersedes the initial exact-output matching choice.
 - ADR-003's invocation design is implemented by Lab 002; its original deferred status was historical.

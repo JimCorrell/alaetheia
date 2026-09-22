@@ -1,6 +1,6 @@
 # Lab 007: Proposal-only workflow selection
 
-- **Status:** Design scoped; not implemented. This increment defines the experiment before implementation.
+- **Status:** Phase A implemented after design review and subsequent user authorization; see [results](lab-007-results.md). Phase B remains deferred.
 - **Decision:** [ADR-009](../architecture/decisions/ADR-009-proposal-only-selection.md)
 - **Question:** Can a bounded selector identify an existing workflow and preserve supplied inputs, while abstaining when the request cannot be resolved safely?
 
@@ -67,7 +67,7 @@ Semantic results are experimental evidence, not a requirement to tune until perf
 
 ## Deliverables and exclusions
 
-Phase A implementation would provide typed proposal/diagnostic records, a closed validator, the three-entry catalog, baseline selector, reviewed fixtures, an evaluation example, focused tests, and a lab results document. Proposal diagnostics should use a small local code vocabulary; do not refactor all existing runtime diagnostics.
+Phase A provides typed proposal/diagnostic records, a closed validator, the three-entry catalog, baseline selector, reviewed fixtures, an evaluation example, focused tests, and a lab results document. Proposal diagnostics should use a small local code vocabulary; do not refactor all existing runtime diagnostics.
 
 No generated workflows, provider selection, automatic execution, supervisor loop, input extraction from prose, model SDK, semantic search, repair, retries, defaults, branching, external data, side effects, persistence, agents, or web UI. Do not change runtime outcomes or existing missing-output observations.
 
