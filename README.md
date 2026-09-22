@@ -10,6 +10,8 @@ Start with the [current architecture and public contract](docs/architecture/curr
 
 Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. Lab 004 adds advisory preflight and missing-output comparisons without changing runtime enforcement. Lab 005 adds typed workflow inputs and reuse across supplied parcel records. Lab 006 distinguishes expected domain rejection from provider exceptions. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
+The next scoped experiment is [Lab 007: proposal-only workflow selection](docs/labs/lab-007-proposal-only-selection.md), with its boundary recorded in [ADR-009](docs/architecture/decisions/ADR-009-proposal-only-selection.md). The design specifies an offline baseline and evaluation before any live-model comparison. It is not implemented, and proposals will not trigger execution.
+
 ## Read in order
 
 1. [Vision](docs/vision.md): purpose, hypothesis, and learning goals.
@@ -28,6 +30,7 @@ Lab 001 is implemented: immutable typed capability declarations, an in-memory re
 | NOW | Advisory workflow preflight and run comparisons | Implemented in Lab 004 |
 | NOW | Typed workflow inputs and reusable local workflows | Implemented in Lab 005 |
 | NOW | Structured domain rejection results | Implemented in Lab 006 |
+| NEXT | Proposal-only selection among predefined workflows | Lab 007 design scoped; implementation deferred |
 | NEXT | Theia supervisor, planning, execution loop, execution ledger | Planned experiments; no implementation authority yet |
 | LATER / UNPROVEN | Worker agents, agent registry, knowledge graph, vector memory, message bus, distributed runtime | Hypotheses requiring evidence |
 

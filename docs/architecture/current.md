@@ -100,7 +100,7 @@ The configured matrix is the explicit CI target, not evidence that a particular 
 
 ## Horizons and supersession
 
-Labs 001–006 and review consolidation are implemented. Lab 007, LLM selection, supervisors, dynamic planning, external providers, side effects, persistence, agents, distributed infrastructure, and web UI remain unimplemented and unauthorized by this reference.
+Labs 001–006 and review consolidation are implemented. [Lab 007](../labs/lab-007-proposal-only-selection.md) now has a scoped design under [ADR-009](decisions/ADR-009-proposal-only-selection.md): an offline baseline for proposals selecting predefined workflows, with separately supplied inputs and no execution. Its implementation remains deferred. Live-model comparison requires a separate scope decision after baseline review. Supervisors, dynamic planning, external providers, side effects, persistence, agents, distributed infrastructure, and web UI remain unimplemented and unauthorized by this reference.
 
 - ADR-002 supersedes the initial exact-output matching choice.
 - ADR-003's invocation design is implemented by Lab 002; its original deferred status was historical.
