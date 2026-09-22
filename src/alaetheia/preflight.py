@@ -4,7 +4,7 @@ from enum import Enum
 
 from .contracts import FieldType, Schema
 from .execution import LocalExecutor, Outcome, validate_payload
-from .workflow import Literal, OutputRef, StepStatus, Workflow, WorkflowRecord
+from .workflow import Literal, OutputRef, StepStatus, Workflow, WorkflowInputRef, WorkflowRecord
 
 
 class Severity(str, Enum):
@@ -70,21 +70,29 @@ class WorkflowPreflight:
                             findings.append(Finding(Severity.ERROR, 'invalid_literal', step.step_id,
                                                     error, binding.field))
                     continue
-                upstream = selections[source.step_id].offer
-                if upstream is None:
-                    findings.append(Finding(Severity.ERROR, 'source_unavailable', step.step_id,
-                                            'Source offer is unavailable', binding.field, source.step_id, source.field))
-                    continue
-                offered = next((f for f in upstream.contract.outputs.fields if f.name == source.field), None)
+                if isinstance(source, WorkflowInputRef):
+                    offered = next(f for f in workflow.inputs.fields if f.name == source.field)
+                    source_step = None
+                    optional_code = 'optional_workflow_input_absent'
+                    optional_message = 'Referenced workflow input may be absent; explicit reference resolution will fail'
+                else:
+                    upstream = selections[source.step_id].offer
+                    if upstream is None:
+                        findings.append(Finding(Severity.ERROR, 'source_unavailable', step.step_id,
+                                                'Source offer is unavailable', binding.field, source.step_id, source.field))
+                        continue
+                    offered = next((f for f in upstream.contract.outputs.fields if f.name == source.field), None)
+                    source_step = source.step_id
+                    optional_code = 'optional_output_absent'
+                    optional_message = 'Referenced output may be absent; resolution fails even for an optional destination'
                 def add(severity, code, message):
                     findings.append(Finding(severity, code, step.step_id, message,
-                                            binding.field, source.step_id, source.field))
+                                            binding.field, source_step, source.field))
                 if offered is None:
                     add(Severity.ERROR, 'undeclared_output', 'Reference does not name a declared provider output')
                     continue
                 if not offered.required:
-                    add(Severity.RISK, 'optional_output_absent',
-                        'Referenced output may be absent; resolution fails even for an optional destination')
+                    add(Severity.RISK, optional_code, optional_message)
                 if target is None or offered.type == target.type:
                     continue
                 if offered.type == FieldType.INTEGER and target.type == FieldType.NUMBER:

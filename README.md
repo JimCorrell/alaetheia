@@ -6,7 +6,7 @@ The first architectural hypothesis is **one reasoning supervisor with a registry
 
 ## Current state
 
-Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. Lab 004 adds advisory preflight and missing-output comparisons without changing runtime enforcement. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
+Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. Lab 004 adds advisory preflight and missing-output comparisons without changing runtime enforcement. Lab 005 adds typed workflow inputs and reuse across supplied parcel records. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
 ## Read in order
 
@@ -24,6 +24,7 @@ Lab 001 is implemented: immutable typed capability declarations, an in-memory re
 | NOW | Explicit local invocation and process-local outcome record | Implemented in Lab 002 |
 | NOW | Sequential workflows with explicit wiring and fail-fast records | Implemented in Lab 003 |
 | NOW | Advisory workflow preflight and run comparisons | Implemented in Lab 004 |
+| NOW | Typed workflow inputs and reusable local workflows | Implemented in Lab 005 |
 | NEXT | Theia supervisor, planning, execution loop, execution ledger | Planned experiments; no implementation authority yet |
 | LATER / UNPROVEN | Worker agents, agent registry, knowledge graph, vector memory, message bus, distributed runtime | Hypotheses requiring evidence |
 
@@ -147,3 +148,32 @@ print(report.status, observation.missing_outputs)
 ```
 
 Reports classify errors and conditional risks, including optional references even when the destination is optional. A clean report does not promise success. Run comparisons identify missing fields without parsing diagnostic text. Monitoring is per explicit run; no background schedule or persistent history is installed.
+
+## Run Lab 005
+
+[Lab 005](docs/labs/lab-005-reusable-workflows.md) gives workflows a reusable input contract. [ADR-006](docs/architecture/decisions/ADR-006-reusable-workflow-inputs.md) records the boundary; [results](docs/labs/lab-005-results.md) describe domain validation, input failures, and missing-output observations.
+
+```sh
+.venv/bin/python -m alaetheia.parcel_example
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+The five-case demo prints successes, a rejected input envelope, and a domain-validation failure. It exits 0 when the demonstration completes; intentional failed cases remain visible in their records.
+
+```python
+from alaetheia import WorkflowPreflight, WorkflowRunner, compare_run
+from alaetheia.parcel_example import example
+
+executor, workflow = example()
+report = WorkflowPreflight(executor).inspect(workflow)
+record = WorkflowRunner(executor).run(workflow, {
+    'parcel_id': 'P-101', 'municipality': 'Example Town',
+    'acreage': 12.5, 'road_access': True,
+})
+print(record.steps[-1].execution.outputs)
+print(compare_run(report, record))
+```
+
+Supply new records to the same definition for subsequent runs. `WorkflowInputRef('acreage')` names a declared workflow input; step bindings choose their destination field explicitly. Inputs are validated before any provider runs. Invalid envelopes return workflow outcome `invalid_input` with `record.errors` and every step skipped. Optional fields may be absent, but explicit references to absent values still fail without defaults. Older literal-only workflows continue to run with omitted inputs.
+
+The example summarizes supplied facts only. Its parcel identifiers and road-access flag are not verified against external sources. Monitoring remains per explicit run, and preflight remains advisory.
