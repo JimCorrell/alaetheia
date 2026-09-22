@@ -6,7 +6,7 @@ Read `README.md`, `docs/architecture/current.md`, `docs/architecture/principles.
 
 Labs 001–006 and the architecture-review consolidation are authorized and implemented. The repository provides deterministic discovery, trusted local invocation, sequential reusable workflows, advisory preflight, structured domain rejection, and local run comparisons. Lab results and ADRs preserve the history; `current.md` resolves superseded behavior.
 
-No Lab 007, supervisor, LLM integration, additional agent, remote provider, side-effecting example, persistence, or distributed runtime is authorized by this file. Keep preflight advisory, provider selection explicit, and absent-reference failures fail-fast. Do not add defaults, retries, repair, or branching without a scoped request.
+Lab 007's design is scoped in `docs/labs/lab-007-proposal-only-selection.md` and ADR-009; implementation remains deferred. No supervisor, LLM integration, additional agent, remote provider, side-effecting example, persistence, or distributed runtime is authorized by this file. Keep preflight advisory, provider selection explicit, and absent-reference failures fail-fast. Do not add defaults, retries, repair, or branching without a scoped request.
 
 ## Working rules
 
