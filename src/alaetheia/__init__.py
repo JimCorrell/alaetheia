@@ -16,3 +16,9 @@ from .workflow import (InputBinding, Literal, OutputRef, StepRecord, StepStatus,
 
 __all__ += ["InputBinding", "Literal", "OutputRef", "StepRecord", "StepStatus", "Workflow",
             "WorkflowOutcome", "WorkflowRecord", "WorkflowRunner", "WorkflowStep"]
+
+from .preflight import (Finding, MissingOutputEvent, PreflightReport, RunComparison,
+                        Severity, WorkflowPreflight, compare_run)
+
+__all__ += ["Finding", "MissingOutputEvent", "PreflightReport", "RunComparison",
+            "Severity", "WorkflowPreflight", "compare_run"]

@@ -6,7 +6,7 @@ The first architectural hypothesis is **one reasoning supervisor with a registry
 
 ## Current state
 
-Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
+Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. Lab 004 adds advisory preflight and missing-output comparisons without changing runtime enforcement. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
 ## Read in order
 
@@ -23,6 +23,7 @@ Lab 001 is implemented: immutable typed capability declarations, an in-memory re
 | NOW | Typed capability contracts and in-memory capability registry | Implemented in Lab 001 |
 | NOW | Explicit local invocation and process-local outcome record | Implemented in Lab 002 |
 | NOW | Sequential workflows with explicit wiring and fail-fast records | Implemented in Lab 003 |
+| NOW | Advisory workflow preflight and run comparisons | Implemented in Lab 004 |
 | NEXT | Theia supervisor, planning, execution loop, execution ledger | Planned experiments; no implementation authority yet |
 | LATER / UNPROVEN | Worker agents, agent registry, knowledge graph, vector memory, message bus, distributed runtime | Hypotheses requiring evidence |
 
@@ -122,3 +123,27 @@ record = WorkflowRunner(executor).run(workflow)
 ```
 
 For a fully wired runnable example, use `example()` in `alaetheia.workflow_example`. Only earlier declared output fields can be referenced. Missing referenced values fail the step; no defaults or implicit forwarding occur. All later steps are skipped after the first failure. Inputs and outputs still pass through the Lab 002 validator. `workflow.py` contains the types and runner; `tests/test_lab003.py` covers composition and failure propagation.
+
+## Run Lab 004
+
+[Lab 004](docs/labs/lab-004-workflow-preflight.md) adds a read-only report; [ADR-005](docs/architecture/decisions/ADR-005-advisory-workflow-preflight.md) defines the hybrid approach. [Results](docs/labs/lab-004-results.md) record observed missing-output failures and remaining questions.
+
+```sh
+.venv/bin/python -m alaetheia.preflight_example
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+The demo compares optional-present, optional-absent, and required-absent scenarios. It exits 0 after displaying the expected success and failure records. Inspection never invokes providers and does not block execution.
+
+```python
+from alaetheia import WorkflowPreflight, WorkflowRunner, compare_run
+from alaetheia.preflight_example import scenario
+
+executor, workflow = scenario(optional=True, omit=True)
+report = WorkflowPreflight(executor).inspect(workflow)
+record = WorkflowRunner(executor).run(workflow)  # Explicit, separate execution.
+observation = compare_run(report, record)
+print(report.status, observation.missing_outputs)
+```
+
+Reports classify errors and conditional risks, including optional references even when the destination is optional. A clean report does not promise success. Run comparisons identify missing fields without parsing diagnostic text. Monitoring is per explicit run; no background schedule or persistent history is installed.
