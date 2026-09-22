@@ -35,6 +35,14 @@ class ExecutionRecord:
     outputs: dict[str, object] | None = None
     errors: tuple[str, ...] = ()
     exception_type: str | None = None
+    missing_output_fields: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class SelectionCheck:
+    """Read-only current selection state; not a reservation or permission grant."""
+    offer: CapabilityManifest | None
+    errors: tuple[str, ...]
 
 
 def _matches(value: object, field_type: FieldType) -> bool:
@@ -100,20 +108,26 @@ class LocalExecutor:
                 raise ValueError('Binding manifest differs from registered offer')
             self._bindings[binding.offer.key] = binding
 
-    def invoke(self, key: OfferKey, requirement: Requirement, payload: object) -> ExecutionRecord:
+    def inspect_selection(self, key: OfferKey, requirement: Requirement) -> SelectionCheck:
+        """Use the same checks for preflight and invocation without calling code."""
         try:
             offer = self._registry.get(key)
         except KeyError:
-            return ExecutionRecord(key, None, Outcome.SELECTION_REJECTED, False,
-                                   errors=('selected offer is not registered',))
+            return SelectionCheck(None, ('selected offer is not registered',))
         binding = self._bindings.get(key)
         errors = list(compatible(requirement, offer).reasons)
         if binding is None:
             errors.append('selected offer has no local binding')
         elif binding.offer != offer:
             errors.append('local binding is stale: registered manifest changed')
-        if errors:
-            return ExecutionRecord(key, offer, Outcome.SELECTION_REJECTED, False, errors=tuple(errors))
+        return SelectionCheck(offer, tuple(errors))
+
+    def invoke(self, key: OfferKey, requirement: Requirement, payload: object) -> ExecutionRecord:
+        selection = self.inspect_selection(key, requirement)
+        offer = selection.offer
+        if selection.errors:
+            return ExecutionRecord(key, offer, Outcome.SELECTION_REJECTED, False, errors=selection.errors)
+        binding = self._bindings[key]
         errors = validate_payload(offer.contract.inputs, payload, allow_extra=False)
         if errors:
             return ExecutionRecord(key, offer, Outcome.INVALID_INPUT, False, errors=errors)
@@ -132,7 +146,13 @@ class LocalExecutor:
             errors += tuple(f'consumer output: {e}' for e in validate_payload(
                 requirement.outputs, output, allow_extra=True))
         if errors:
-            return ExecutionRecord(key, offer, Outcome.INVALID_OUTPUT, True, inputs, errors=errors)
+            # Preserve missing-field evidence without retaining invalid raw output
+            # or requiring observers to parse human-readable diagnostics.
+            schemas = (offer.contract.outputs,) + ((requirement.outputs,) if requirement.outputs is not None else ())
+            missing = tuple(sorted({field.name for schema in schemas for field in schema.fields
+                                    if field.required and type(output) is dict and field.name not in output}))
+            return ExecutionRecord(key, offer, Outcome.INVALID_OUTPUT, True, inputs,
+                                   errors=errors, missing_output_fields=missing)
         try:
             # Retain extra output fields, including nested extras, without sharing
             # mutable containers with the provider. This is not payload persistence.

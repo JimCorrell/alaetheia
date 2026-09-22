@@ -26,3 +26,7 @@ Lab 002 was explicitly authorized after the design PR merged. For its invocation
 ## Lab 003 follow-up
 
 Lab 003 was explicitly authorized after Lab 002 merged. Read `docs/labs/lab-003-deterministic-workflow.md`, `docs/labs/lab-003-results.md`, and ADR-004 for sequential composition. Reuse LocalExecutor; keep provider selection, input wiring, and fail-fast outcomes explicit. No planning, branching, parallelism, retries, persistence, or subsequent lab is authorized by this note.
+
+## Lab 004 follow-up
+
+Lab 004 authorizes read-only preflight and explicit-run comparison for missing-output failures. Read `docs/labs/lab-004-workflow-preflight.md`, `docs/labs/lab-004-results.md`, and ADR-005. Preserve runtime enforcement and the separation between inspection and invocation; do not add blocking gates or implicit defaults. No later lab is authorized by this note.
