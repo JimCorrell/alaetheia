@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from enum import Enum
 import math
 
-from .contracts import OfferKey, Requirement, identifier
-from .execution import ExecutionRecord, LocalExecutor, Outcome
+from .contracts import OfferKey, Requirement, Schema, identifier
+from .execution import ExecutionRecord, LocalExecutor, Outcome, validate_payload
 
 
 @dataclass(frozen=True)
@@ -29,14 +29,22 @@ class OutputRef:
 
 
 @dataclass(frozen=True)
-class InputBinding:
+class WorkflowInputRef:
     field: str
-    source: Literal | OutputRef
 
     def __post_init__(self) -> None:
         identifier(self.field)
-        if not isinstance(self.source, (Literal, OutputRef)):
-            raise ValueError('Input source must be a Literal or OutputRef')
+
+
+@dataclass(frozen=True)
+class InputBinding:
+    field: str
+    source: Literal | OutputRef | WorkflowInputRef
+
+    def __post_init__(self) -> None:
+        identifier(self.field)
+        if not isinstance(self.source, (Literal, OutputRef, WorkflowInputRef)):
+            raise ValueError('Input source must be a Literal, OutputRef, or WorkflowInputRef')
 
 
 @dataclass(frozen=True)
@@ -60,6 +68,7 @@ class WorkflowStep:
 class Workflow:
     workflow_id: str
     steps: tuple[WorkflowStep, ...]
+    inputs: Schema = Schema(())
 
     def __post_init__(self) -> None:
         identifier(self.workflow_id)
@@ -67,11 +76,16 @@ class Workflow:
             not isinstance(step, WorkflowStep) for step in self.steps
         ):
             raise ValueError('Workflow requires a nonempty tuple of steps')
+        if not isinstance(self.inputs, Schema):
+            raise ValueError('Workflow inputs must be a Schema')
+        input_names = {f.name for f in self.inputs.fields}
         seen = set()
         for step in self.steps:
             if step.step_id in seen:
                 raise ValueError(f'Duplicate step ID: {step.step_id}')
             for binding in step.inputs:
+                if isinstance(binding.source, WorkflowInputRef) and binding.source.field not in input_names:
+                    raise ValueError(f'{step.step_id}: reference names an undeclared workflow input')
                 if isinstance(binding.source, OutputRef) and binding.source.step_id not in seen:
                     raise ValueError(f'{step.step_id}: output reference must name an earlier step')
             seen.add(step.step_id)
@@ -84,6 +98,7 @@ class StepStatus(str, Enum):
 
 
 class WorkflowOutcome(str, Enum):
+    INVALID_INPUT = 'invalid_input'
     SUCCESS = 'success'
     FAILED = 'failed'
 
@@ -102,6 +117,11 @@ class WorkflowRecord:
     outcome: WorkflowOutcome
     steps: tuple[StepRecord, ...]
     failed_step: str | None
+    inputs: dict[str, object] | None = None
+    errors: tuple[str, ...] = ()
+
+
+_UNSUPPLIED = object()
 
 
 class WorkflowRunner:
@@ -113,7 +133,18 @@ class WorkflowRunner:
     def __init__(self, executor: LocalExecutor) -> None:
         self._executor = executor
 
-    def run(self, workflow: Workflow) -> WorkflowRecord:
+    def run(self, workflow: Workflow, inputs: object = _UNSUPPLIED) -> WorkflowRecord:
+        # Omitted inputs preserve legacy no-input workflows. Explicit None is an
+        # invalid payload, not an alias for omission. Check the whole envelope
+        # before even resolving a selected offer or invoking a function.
+        supplied = {} if inputs is _UNSUPPLIED else inputs
+        errors = validate_payload(workflow.inputs, supplied, allow_extra=False)
+        if errors:
+            skipped = tuple(StepRecord(step.step_id, StepStatus.SKIPPED, None,
+                                       ('workflow inputs rejected before execution',))
+                            for step in workflow.steps)
+            return WorkflowRecord(workflow, WorkflowOutcome.INVALID_INPUT, skipped, None, errors=errors)
+        snapshot = dict(supplied)  # Schema validation limits values to immutable scalars.
         records: list[StepRecord] = []
         successes: dict[str, ExecutionRecord] = {}
         failed_step = None
@@ -128,6 +159,12 @@ class WorkflowRunner:
                 source = binding.source
                 if isinstance(source, Literal):
                     payload[binding.field] = source.value
+                    continue
+                if isinstance(source, WorkflowInputRef):
+                    if source.field not in snapshot:
+                        errors.append(f'{binding.field!r}: workflow input {source.field!r} is absent')
+                    else:
+                        payload[binding.field] = snapshot[source.field]
                     continue
                 upstream = successes[source.step_id]
                 # Extra outputs are retained for inspection, but only fields in
@@ -151,4 +188,4 @@ class WorkflowRunner:
                 failed_step = step.step_id
                 records.append(StepRecord(step.step_id, StepStatus.FAILED, execution, execution.errors))
         return WorkflowRecord(workflow, WorkflowOutcome.FAILED if failed_step else WorkflowOutcome.SUCCESS,
-                              tuple(records), failed_step)
+                              tuple(records), failed_step, snapshot)

@@ -30,3 +30,7 @@ Lab 003 was explicitly authorized after Lab 002 merged. Read `docs/labs/lab-003-
 ## Lab 004 follow-up
 
 Lab 004 authorizes read-only preflight and explicit-run comparison for missing-output failures. Read `docs/labs/lab-004-workflow-preflight.md`, `docs/labs/lab-004-results.md`, and ADR-005. Preserve runtime enforcement and the separation between inspection and invocation; do not add blocking gates or implicit defaults. No later lab is authorized by this note.
+
+## Lab 005 follow-up
+
+Lab 005 authorizes typed workflow inputs and reuse of a deterministic supplied-record example. Read `docs/labs/lab-005-reusable-workflows.md`, `docs/labs/lab-005-results.md`, and ADR-006. Validate full workflow input envelopes before invocation, preserve explicit reference semantics and advisory preflight, and keep missing-input failures distinct from missing-output observations. No later lab is authorized here.

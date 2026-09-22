@@ -22,3 +22,7 @@ from .preflight import (Finding, MissingOutputEvent, PreflightReport, RunCompari
 
 __all__ += ["Finding", "MissingOutputEvent", "PreflightReport", "RunComparison",
             "Severity", "WorkflowPreflight", "compare_run"]
+
+from .workflow import WorkflowInputRef
+
+__all__ += ["WorkflowInputRef"]
