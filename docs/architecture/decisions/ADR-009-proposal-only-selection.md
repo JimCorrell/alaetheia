@@ -1,6 +1,6 @@
 # ADR-009: Scope the proposal-only selection experiment
 
-- **Status:** Accepted as the Lab 007 design boundary; implementation and live-model integration remain deferred
+- **Status:** Accepted; Phase A subsequently authorized and implemented. Live-model integration remains deferred
 - **Date:** 2026-09-22
 - **Scope:** Define the next experiment after the merged architecture consolidation
 
@@ -25,3 +25,7 @@ Overlapping text operations expose ambiguity without introducing new infrastruct
 The baseline may be sufficient for such a small catalog. Prefer it if a later model adds no measured benefit. This experiment does not establish a need for additional agents, dynamic plans, or broader workflow machinery.
 
 See the [Lab 007 brief](../../labs/lab-007-proposal-only-selection.md) for fixtures, metrics, acceptance evidence, exclusions, and discussion questions.
+
+## Implementation status
+
+Following design PR #9 and subsequent user authorization, Phase A is implemented. See [results](../../labs/lab-007-results.md) for the frozen baseline, limitations, and evidence. This does not authorize Phase B or execution of proposals.
