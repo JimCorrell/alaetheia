@@ -28,3 +28,8 @@
 | Runtime memory | Potential future storage of user/context facts or past experience for Theia; deferred. |
 
 The distinction to keep in view: a capability describes **what** can be done; a provider describes **who or what implements it**; a tool describes **how a reasoning unit invokes it**; a workflow describes **ordered work**; an agent independently decides **how to achieve a delegated outcome**.
+
+## Lab 006 additions
+
+- **Domain issue:** A machine-readable code, explanatory message, and optional input-field reference describing an expected domain problem.
+- **Domain rejection:** An explicit typed provider result containing one or more domain issues, with no successful output. Distinct from input-shape rejection, provider exception, and invalid success output.

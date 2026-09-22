@@ -10,12 +10,14 @@ import math
 
 from .contracts import CapabilityManifest, FieldType, OfferKey, Requirement, Schema
 from .registry import CapabilityRegistry, compatible
+from .domain import DomainIssue, DomainRejection
 
 
 class Outcome(str, Enum):
     SUCCESS = 'success'
     SELECTION_REJECTED = 'selection_rejected'
     INVALID_INPUT = 'invalid_input'
+    DOMAIN_REJECTED = 'domain_rejected'
     PROVIDER_FAILURE = 'provider_failure'
     INVALID_OUTPUT = 'invalid_output'
 
@@ -36,6 +38,7 @@ class ExecutionRecord:
     errors: tuple[str, ...] = ()
     exception_type: str | None = None
     missing_output_fields: tuple[str, ...] = ()
+    domain_issues: tuple[DomainIssue, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -140,6 +143,19 @@ class LocalExecutor:
             # Process-control exceptions (KeyboardInterrupt, SystemExit) propagate.
             return ExecutionRecord(key, offer, Outcome.PROVIDER_FAILURE, True, inputs,
                                    errors=(str(error),), exception_type=type(error).__name__)
+        if isinstance(output, DomainRejection):
+            # Explicit rejection is an alternative outcome, not an output record
+            # missing its promised success fields. Never infer it from exceptions
+            # or from dictionary keys such as "errors".
+            names = {field.name for field in offer.contract.inputs.fields}
+            unknown = sorted({issue.field for issue in output.issues
+                              if issue.field is not None and issue.field not in names})
+            if unknown:
+                return ExecutionRecord(key, offer, Outcome.INVALID_OUTPUT, True, inputs,
+                                       errors=(f'Domain issue names undeclared input fields: {unknown}',))
+            return ExecutionRecord(key, offer, Outcome.DOMAIN_REJECTED, True, inputs,
+                                   errors=tuple(issue.message for issue in output.issues),
+                                   domain_issues=output.issues)
         errors = tuple(f'provider output: {e}' for e in validate_payload(
             offer.contract.outputs, output, allow_extra=True))
         if requirement.outputs is not None:

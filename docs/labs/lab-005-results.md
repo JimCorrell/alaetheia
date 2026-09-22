@@ -1,5 +1,7 @@
 # Lab 005 results: reusable workflow inputs
 
+Historical report: Lab 006 subsequently replaces the parcel validator's exception-based domain rejection with structured results under contract 2.0.0. See [Lab 006 results](lab-006-results.md).
+
 ## Outcome
 
 One immutable `parcel-record-summary` workflow now accepts multiple supplied parcel records. It first validates domain values and trims identifier/municipality whitespace, then produces a descriptive summary from the validated outputs. No provider is selected dynamically and no external source is consulted.

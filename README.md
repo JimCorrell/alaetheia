@@ -6,7 +6,7 @@ The first architectural hypothesis is **one reasoning supervisor with a registry
 
 ## Current state
 
-Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. Lab 004 adds advisory preflight and missing-output comparisons without changing runtime enforcement. Lab 005 adds typed workflow inputs and reuse across supplied parcel records. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
+Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. Lab 004 adds advisory preflight and missing-output comparisons without changing runtime enforcement. Lab 005 adds typed workflow inputs and reuse across supplied parcel records. Lab 006 distinguishes expected domain rejection from provider exceptions. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
 ## Read in order
 
@@ -25,6 +25,7 @@ Lab 001 is implemented: immutable typed capability declarations, an in-memory re
 | NOW | Sequential workflows with explicit wiring and fail-fast records | Implemented in Lab 003 |
 | NOW | Advisory workflow preflight and run comparisons | Implemented in Lab 004 |
 | NOW | Typed workflow inputs and reusable local workflows | Implemented in Lab 005 |
+| NOW | Structured domain rejection results | Implemented in Lab 006 |
 | NEXT | Theia supervisor, planning, execution loop, execution ledger | Planned experiments; no implementation authority yet |
 | LATER / UNPROVEN | Worker agents, agent registry, knowledge graph, vector memory, message bus, distributed runtime | Hypotheses requiring evidence |
 
@@ -177,3 +178,20 @@ print(compare_run(report, record))
 Supply new records to the same definition for subsequent runs. `WorkflowInputRef('acreage')` names a declared workflow input; step bindings choose their destination field explicitly. Inputs are validated before any provider runs. Invalid envelopes return workflow outcome `invalid_input` with `record.errors` and every step skipped. Optional fields may be absent, but explicit references to absent values still fail without defaults. Older literal-only workflows continue to run with omitted inputs.
 
 The example summarizes supplied facts only. Its parcel identifiers and road-access flag are not verified against external sources. Monitoring remains per explicit run, and preflight remains advisory.
+
+## Lab 006: Structured domain rejection
+
+[ADR-007](docs/architecture/decisions/ADR-007-structured-domain-rejections.md), the [lab brief](docs/labs/lab-006-domain-validation.md), and [results](docs/labs/lab-006-results.md) document the distinction between expected domain rejection and provider exceptions.
+
+```python
+from alaetheia import DomainIssue, DomainRejection
+
+# A local provider can return this instead of its normal success dictionary:
+rejection = DomainRejection((
+    DomainIssue('nonpositive_acreage', 'Acreage must be positive', 'acreage'),
+))
+```
+
+Run `.venv/bin/python -m alaetheia.parcel_example` to see structured issues for the negative-acreage case. The validator now uses contract 2.0.0. Its step outcome is `domain_rejected`; the workflow still stops and skips summary. ExecutionRecord exposes `domain_issues`, and run comparisons expose both `failed_execution_outcome` and `domain_issues`. Expected rejection creates no missing-output event.
+
+Successful dictionary outputs still undergo full schema validation. Exceptions remain `provider_failure`, even if their message describes bad data. Rejection issue fields must name declared provider inputs or be `None` for record-level issues. No automatic repair, defaults, or retry is performed.

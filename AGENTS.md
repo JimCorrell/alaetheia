@@ -34,3 +34,7 @@ Lab 004 authorizes read-only preflight and explicit-run comparison for missing-o
 ## Lab 005 follow-up
 
 Lab 005 authorizes typed workflow inputs and reuse of a deterministic supplied-record example. Read `docs/labs/lab-005-reusable-workflows.md`, `docs/labs/lab-005-results.md`, and ADR-006. Validate full workflow input envelopes before invocation, preserve explicit reference semantics and advisory preflight, and keep missing-input failures distinct from missing-output observations. No later lab is authorized here.
+
+## Lab 006 follow-up
+
+Lab 006 authorizes structured domain-rejection results. Read `docs/labs/lab-006-domain-validation.md`, `docs/labs/lab-006-results.md`, and ADR-007. Keep domain rejection explicit and distinct from exceptions and output-contract failures; preserve fail-fast behavior and missing-output attribution. Do not infer recovery or later-lab authority from structured issues.
