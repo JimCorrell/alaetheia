@@ -1,4 +1,4 @@
-# Labs 001–005 behavior tests
+# Labs 001–006 behavior tests
 
 From the repository root after installing the package:
 
@@ -13,3 +13,5 @@ Lab 003 tests compose pure local functions, check definition validation and fail
 Lab 004 tests compare advisory findings with explicit local runs and distinguish missing required outputs from absent optional references, malformed values, and skipped consumers.
 
 Lab 005 tests reuse one parcel workflow with varied records, reject invalid envelopes before calls, check domain failures and optional-input semantics, and preserve missing-output observations. All data is supplied locally.
+
+Lab 006 tests separate expected domain rejection from exceptions and malformed output, exercise multiple typed issues, and verify fail-fast workflows without false missing-output events. The prior parcel-domain expectation is intentionally updated to domain_rejected.

@@ -70,7 +70,7 @@ class ReusableWorkflowTests(unittest.TestCase):
             self.assertEqual(report.status, 'no_detected_issues')
             self.assertEqual(record.outcome, WorkflowOutcome.FAILED)
             self.assertEqual(record.failed_step, 'validate')
-            self.assertEqual(record.steps[0].execution.outcome, Outcome.PROVIDER_FAILURE)
+            self.assertEqual(record.steps[0].execution.outcome, Outcome.DOMAIN_REJECTED)
             self.assertEqual(record.steps[1].status, StepStatus.SKIPPED)
             self.assertEqual(compare_run(report, record).missing_outputs, ())
 

@@ -4,6 +4,7 @@ from enum import Enum
 
 from .contracts import FieldType, Schema
 from .execution import LocalExecutor, Outcome, validate_payload
+from .domain import DomainIssue
 from .workflow import Literal, OutputRef, StepStatus, Workflow, WorkflowInputRef, WorkflowRecord
 
 
@@ -122,6 +123,8 @@ class RunComparison:
     failed_step: str | None
     skipped_steps: tuple[str, ...]
     missing_outputs: tuple[MissingOutputEvent, ...]
+    failed_execution_outcome: str | None = None
+    domain_issues: tuple[DomainIssue, ...] = ()
 
 
 def compare_run(report: PreflightReport, record: WorkflowRecord) -> RunComparison:
@@ -156,5 +159,9 @@ def compare_run(report: PreflightReport, record: WorkflowRecord) -> RunCompariso
                                 and f.source_field == source.field for f in report.findings)
                 events.append(MissingOutputEvent('referenced_output_absent', source.step_id, source.field,
                                                 step.step_id, binding.field, predicted))
+    failed = records.get(record.failed_step)
+    execution = failed.execution if failed is not None else None
     return RunComparison(report.status, record.outcome.value, record.failed_step,
-                         tuple(s.step_id for s in record.steps if s.status == StepStatus.SKIPPED), tuple(events))
+                         tuple(s.step_id for s in record.steps if s.status == StepStatus.SKIPPED), tuple(events),
+                         execution.outcome.value if execution else None,
+                         execution.domain_issues if execution else ())

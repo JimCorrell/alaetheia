@@ -26,3 +26,7 @@ __all__ += ["Finding", "MissingOutputEvent", "PreflightReport", "RunComparison",
 from .workflow import WorkflowInputRef
 
 __all__ += ["WorkflowInputRef"]
+
+from .domain import DomainIssue, DomainRejection
+
+__all__ += ["DomainIssue", "DomainRejection"]

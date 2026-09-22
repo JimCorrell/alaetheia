@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from .contracts import (CapabilityContract, CapabilityManifest, Field, FieldType, Metadata,
                         Requirement, Schema, Version, VersionRange)
 from .execution import LocalBinding, LocalExecutor
+from .domain import DomainIssue, DomainRejection
 from .preflight import WorkflowPreflight, compare_run
 from .registry import CapabilityRegistry
 from .workflow import InputBinding, OutputRef, Workflow, WorkflowInputRef, WorkflowRunner, WorkflowStep
@@ -19,12 +20,17 @@ PARCEL_INPUTS = Schema((
 SUMMARY_OUTPUT = Schema((Field('summary', FieldType.STRING, True, 'Descriptive summary of supplied data only.'),))
 
 
-def validate_parcel(values: Mapping[str, object]) -> dict[str, object]:
-    # Scalar validation is the runtime's job; these are domain-specific rules.
-    if not values['parcel_id'].strip() or not values['municipality'].strip():
-        raise ValueError('Parcel ID and municipality must contain non-whitespace text')
+def validate_parcel(values: Mapping[str, object]) -> dict[str, object] | DomainRejection:
+    # Scalar validation is the runtime's job; report all expected domain issues
+    # in a stable order. Unexpected exceptions still indicate provider failure.
+    issues = []
+    for name in ('parcel_id', 'municipality'):
+        if not values[name].strip():
+            issues.append(DomainIssue('blank_text', 'Must contain non-whitespace text', name))
     if values['acreage'] <= 0:
-        raise ValueError('Acreage must be positive')
+        issues.append(DomainIssue('nonpositive_acreage', 'Acreage must be positive', 'acreage'))
+    if issues:
+        return DomainRejection(tuple(issues))
     return {**values, 'parcel_id': values['parcel_id'].strip(),
             'municipality': values['municipality'].strip()}
 
@@ -43,8 +49,9 @@ def example() -> tuple[LocalExecutor, Workflow]:
         ('validate', PARCEL_INPUTS, validate_parcel),
         ('summarize', SUMMARY_OUTPUT, summarize_parcel),
     ):
-        contract = CapabilityContract(f'parcel.record.{step_id}', Version(1, 0, 0), PARCEL_INPUTS, outputs)
-        offer = CapabilityManifest(contract, 'local-python', 'direct', Version(1, 0, 0),
+        version = Version(2, 0, 0) if step_id == 'validate' else Version(1, 0, 0)
+        contract = CapabilityContract(f'parcel.record.{step_id}', version, PARCEL_INPUTS, outputs)
+        offer = CapabilityManifest(contract, 'local-python', 'direct', version,
             Metadata('Pure supplied-record example; no parcel lookup or suitability assessment.',
                      frozenset({'parcel'}), frozenset(), frozenset(), 'alaetheia.parcel_example'))
         registry.register(offer)
@@ -52,7 +59,7 @@ def example() -> tuple[LocalExecutor, Workflow]:
         wiring = tuple(InputBinding(f.name, WorkflowInputRef(f.name) if step_id == 'validate'
                                    else OutputRef('validate', f.name)) for f in PARCEL_INPUTS.fields)
         steps.append(WorkflowStep(step_id, offer.key,
-            Requirement(contract.capability_id, VersionRange.parse('1.0.0'), PARCEL_INPUTS, outputs), wiring))
+            Requirement(contract.capability_id, VersionRange.parse(str(version)), PARCEL_INPUTS, outputs), wiring))
     return LocalExecutor(registry, tuple(bindings)), Workflow('parcel-record-summary', tuple(steps), PARCEL_INPUTS)
 
 
@@ -72,6 +79,8 @@ def main() -> None:
         results.append({'case': name, 'inputs': record.inputs, 'errors': record.errors,
                         'comparison': asdict(compare_run(report, record)),
                         'steps': [{'step_id': s.step_id, 'status': s.status.value, 'errors': s.errors,
+                                   'execution_outcome': s.execution.outcome.value if s.execution else None,
+                                   'domain_issues': [asdict(i) for i in s.execution.domain_issues] if s.execution else [],
                                    'outputs': s.execution.outputs if s.execution else None} for s in record.steps]})
     print(json.dumps(results, indent=2))
 
