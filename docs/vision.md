@@ -1,5 +1,8 @@
 # Vision and learning agenda
 
+The initial lab horizon below is historical. See the [current architecture](architecture/current.md) for implemented Labs 001–006, consolidation, and today's boundaries.
+
+
 Alaetheia, or Theia, is intended to become a personal supervisor that accepts a goal, finds available capabilities, forms a plan, executes bounded actions, observes what happened, revises when necessary, and returns a result supported by evidence. The long-term aspiration is a reliable interface across tools and domains, not a predetermined collection of personas or agents.
 
 The first executable hypothesis is narrower: **one supervisor can orchestrate explicit capabilities and ordinary services across a useful class of goals**. Before adding another reasoning component, we need to learn where this design fails. Capability discovery therefore comes first. A supervisor cannot choose responsibly among operations it cannot inspect or compare.

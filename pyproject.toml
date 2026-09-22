@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "alaetheia"
-version = "0.1.0"
-description = "Alaetheia capability contracts and in-memory discovery laboratory"
+version = "0.2.0"
+description = "Alaetheia typed discovery and deterministic workflow laboratory"
 requires-python = ">=3.12"
 
 [tool.setuptools.packages.find]

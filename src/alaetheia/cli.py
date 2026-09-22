@@ -13,8 +13,9 @@ def main(argv: list[str] | None = None) -> int:
     listing.add_argument('--json', action='store_true')
     inspect = sub.add_parser('inspect')
     inspect.add_argument('capability_id')
-    inspect.add_argument('--version', help='Exact MAJOR.MINOR.PATCH')
-    inspect.add_argument('--range', dest='version_range', help='e.g. ">=2.0.0 <3.0.0"')
+    versions = inspect.add_mutually_exclusive_group()
+    versions.add_argument('--version', help='Exact MAJOR.MINOR.PATCH')
+    versions.add_argument('--range', dest='version_range', help='e.g. ">=2.0.0 <3.0.0"')
     inspect.add_argument('--json', action='store_true')
     args = parser.parse_args(argv)
     registry = sample_registry()
@@ -22,11 +23,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == 'list':
             offers = registry.list()
         else:
-            if args.version and args.version_range:
-                raise ValueError('Use either --version or --range')
-            if args.version:
+            if args.version is not None:
                 Version.parse(args.version)
-            requirement = Requirement(args.capability_id, VersionRange.parse(args.version or args.version_range or '>=0.0.0'))
+                expression = args.version
+            elif args.version_range is not None:
+                expression = args.version_range
+            else:
+                expression = '>=0.0.0'
+            requirement = Requirement(args.capability_id, VersionRange.parse(expression))
             offers = registry.find(requirement)
             if not offers:
                 raise ValueError('No offers match the capability ID and version requirement')

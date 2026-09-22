@@ -3,6 +3,8 @@
 - **Status:** Accepted for Lab 005
 - **Date:** 2026-09-22
 
+The exception-based parcel-domain outcome in this decision is superseded by [ADR-007](ADR-007-structured-domain-rejections.md); reusable input rules remain in force.
+
 ## Context
 
 Lab 003 embedded caller values as literals in each definition. The next agreed experiment runs one explicit workflow against different supplied records, retaining advisory preflight and missing-output observations. This tests reuse without introducing a planner or external services.
