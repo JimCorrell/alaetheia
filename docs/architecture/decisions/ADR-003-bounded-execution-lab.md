@@ -1,6 +1,6 @@
 # ADR-003: Test one explicit invocation before planning
 
-- **Status:** Accepted for Lab 002 design; implementation deferred
+- **Status:** Accepted; implemented in Lab 002. Original design-only authorization notes below are historical.
 - **Date:** 2026-09-21
 - **Scope:** Next experiment after the Lab 001 discovery foundation
 

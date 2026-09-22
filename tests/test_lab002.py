@@ -167,7 +167,7 @@ class Invocation(unittest.TestCase):
         record = self.executor_with(lambda p: {'count': 1, 'extra': Uncopyable()}).invoke(
             self.key, self.requirement, {'text': 'x'})
         self.assertEqual(record.outcome, Outcome.INVALID_OUTPUT)
-        self.assertEqual(record.errors, ('output cannot be copied for inspection',))
+        self.assertEqual(record.errors, ('output contains an unsupported value; only builtin data values are allowed',))
 
     def test_binding_guards(self):
         binding = LocalBinding(self.offer, lambda p: {'count': 0})

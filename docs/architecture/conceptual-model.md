@@ -1,5 +1,8 @@
 # Conceptual model
 
+The initial lab horizon below is historical. See the [current architecture](current.md) for implemented Labs 001–006, consolidation, and today's boundaries.
+
+
 This model names the boundaries that future implementations must preserve. It is not a class diagram and does not imply that every concept exists in Lab 001.
 
 ```text

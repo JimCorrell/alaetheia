@@ -6,6 +6,8 @@ The first architectural hypothesis is **one reasoning supervisor with a registry
 
 ## Current state
 
+Start with the [current architecture and public contract](docs/architecture/current.md), including the supported output values, outcome model, and CI targets. Historical lab sections below explain how the design evolved.
+
 Lab 001 is implemented: immutable typed capability declarations, an in-memory registry, deterministic compatibility/discovery, and a sample-catalog inspection CLI. Lab 002 adds explicit invocation of trusted, pure local examples with payload validation and an inspectable record. Lab 003 composes explicit invocations into sequential workflows with data dependencies and fail-fast records. Lab 004 adds advisory preflight and missing-output comparisons without changing runtime enforcement. Lab 005 adds typed workflow inputs and reuse across supplied parcel records. Lab 006 distinguishes expected domain rejection from provider exceptions. The catalog inspection CLI still executes nothing. See the [Lab 001 specification](docs/labs/lab-001-capability-registry.md) and [experiment results and open questions](docs/labs/lab-001-results.md).
 
 ## Read in order
@@ -97,7 +99,7 @@ record = executor.invoke(selected_key, requirement, {'text': 'Theia'})
 print(record.outcome.value, record.outputs)
 ```
 
-The outcome is `success`, `selection_rejected`, `invalid_input`, `provider_failure`, or `invalid_output`. Discovery never selects an implementation automatically. Bindings refer to exact manifests and must be rebuilt after an implementation replacement. Input fields are closed; additional outputs are retained. Optional fields may be absent but may not be `None`. See the results document for precise scalar rules and limitations.
+The outcome is `success`, `selection_rejected`, `invalid_input`, `domain_rejected`, `provider_failure`, or `invalid_output`. Discovery never selects an implementation automatically. Bindings refer to exact manifests and must be rebuilt after an implementation replacement. Input fields are closed; additional outputs are retained. Optional fields may be absent but may not be `None`. See the results document for precise scalar rules and limitations.
 
 ## Run Lab 003
 
@@ -195,3 +197,7 @@ rejection = DomainRejection((
 Run `.venv/bin/python -m alaetheia.parcel_example` to see structured issues for the negative-acreage case. The validator now uses contract 2.0.0. Its step outcome is `domain_rejected`; the workflow still stops and skips summary. ExecutionRecord exposes `domain_issues`, and run comparisons expose both `failed_execution_outcome` and `domain_issues`. Expected rejection creates no missing-output event.
 
 Successful dictionary outputs still undergo full schema validation. Exceptions remain `provider_failure`, even if their message describes bad data. Rejection issue fields must name declared provider inputs or be `None` for record-level issues. No automatic repair, defaults, or retry is performed.
+
+## Architecture consolidation
+
+Library 0.2.0 fixes the three [review findings](docs/architecture/reviews/2026-09-22-architecture-review.md). Successful outputs now contain only supported builtin data values; custom copy hooks are never invoked. See [ADR-008](docs/architecture/decisions/ADR-008-output-data-and-review-hardening.md) for the compatibility change. [CI](.github/workflows/tests.yml) installs the package and runs the full suite, compilation, and CLI smoke test on Python 3.12–3.14 for pushes and PRs. No model integration or next lab is included.

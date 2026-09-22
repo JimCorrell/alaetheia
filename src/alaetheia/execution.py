@@ -3,7 +3,6 @@
 This is not a sandbox, scheduler, persistent ledger, or authorization engine.
 """
 from collections.abc import Callable, Mapping
-from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
 import math
@@ -11,6 +10,7 @@ import math
 from .contracts import CapabilityManifest, FieldType, OfferKey, Requirement, Schema
 from .registry import CapabilityRegistry, compatible
 from .domain import DomainIssue, DomainRejection
+from .output_values import snapshot_output
 
 
 class Outcome(str, Enum):
@@ -46,6 +46,14 @@ class SelectionCheck:
     """Read-only current selection state; not a reservation or permission grant."""
     offer: CapabilityManifest | None
     errors: tuple[str, ...]
+
+
+def _exception_message(error: Exception) -> str:
+    """A broken exception formatter must not erase the original failure record."""
+    try:
+        return str(error)
+    except Exception:
+        return f'{type(error).__name__}: exception message unavailable'
 
 
 def _matches(value: object, field_type: FieldType) -> bool:
@@ -142,7 +150,7 @@ class LocalExecutor:
         except Exception as error:
             # Process-control exceptions (KeyboardInterrupt, SystemExit) propagate.
             return ExecutionRecord(key, offer, Outcome.PROVIDER_FAILURE, True, inputs,
-                                   errors=(str(error),), exception_type=type(error).__name__)
+                                   errors=(_exception_message(error),), exception_type=type(error).__name__)
         if isinstance(output, DomainRejection):
             # Explicit rejection is an alternative outcome, not an output record
             # missing its promised success fields. Never infer it from exceptions
@@ -156,6 +164,13 @@ class LocalExecutor:
             return ExecutionRecord(key, offer, Outcome.DOMAIN_REJECTED, True, inputs,
                                    errors=tuple(issue.message for issue in output.issues),
                                    domain_issues=output.issues)
+        try:
+            output = snapshot_output(output)
+        except Exception as error:
+            return ExecutionRecord(key, offer, Outcome.INVALID_OUTPUT, True, inputs,
+                                   errors=(_exception_message(error),),
+                                   exception_type=type(error).__name__)
+        # Validate the exact detached data that will be recorded and consumed.
         errors = tuple(f'provider output: {e}' for e in validate_payload(
             offer.contract.outputs, output, allow_extra=True))
         if requirement.outputs is not None:
@@ -169,12 +184,4 @@ class LocalExecutor:
                                     if field.required and type(output) is dict and field.name not in output}))
             return ExecutionRecord(key, offer, Outcome.INVALID_OUTPUT, True, inputs,
                                    errors=errors, missing_output_fields=missing)
-        try:
-            # Retain extra output fields, including nested extras, without sharing
-            # mutable containers with the provider. This is not payload persistence.
-            snapshot = deepcopy(output)
-        except Exception as error:
-            return ExecutionRecord(key, offer, Outcome.INVALID_OUTPUT, True, inputs,
-                                   errors=('output cannot be copied for inspection',),
-                                   exception_type=type(error).__name__)
-        return ExecutionRecord(key, offer, Outcome.SUCCESS, True, inputs, snapshot)
+        return ExecutionRecord(key, offer, Outcome.SUCCESS, True, inputs, output)

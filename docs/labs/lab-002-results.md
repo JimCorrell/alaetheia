@@ -1,5 +1,8 @@
 # Lab 002 results: explicit local invocation
 
+Historical snapshot note: arbitrary copyable extras described below are superseded by [ADR-008](../architecture/decisions/ADR-008-output-data-and-review-hardening.md) and the [current output contract](../architecture/current.md).
+
+
 ## Outcome and scope
 
 Implemented the accepted ADR-003 experiment after explicit implementation authorization. Two pure local functions advertise the same `text.characters.count@1.0.0` contract. A deterministic caller names an exact offer, invokes it once, validates the exchange, and receives a process-local record. The Lab 001 catalog and inspection CLI continue to execute nothing.
